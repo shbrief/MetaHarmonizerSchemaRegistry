@@ -148,3 +148,29 @@ Two narrative walk-throughs of the same checks live in
 [`../vignettes`](../vignettes):
 [`schema_validation.Rmd`](../vignettes/schema_validation.Rmd) (R) and
 [`schema_validation.ipynb`](../vignettes/schema_validation.ipynb) (Python).
+
+## `lint_schema.py` — check schema tables against the conventions
+
+```bash
+python scripts/lint_schema.py                 # every schema/*/*_schema*.csv
+python scripts/lint_schema.py --quiet         # per-file counts only
+python scripts/lint_schema.py PATH --online   # also check roots in OLS4 (network)
+python scripts/lint_schema.py --strict        # warnings fail too
+```
+
+It checks the file format, the header names and order, the closed vocabularies
+(`col.class`, `unique`, `required`, `multiplevalues`, `corpus.type`, and
+`dynamic.enum.property`), the `|` lists, CURIE syntax, how `static.enum` codes
+pair with labels, and the `<;>` data delimiter.
+
+- `static_enum` lists should have term IDs; a missing ID is a warning.
+- `custom_enum` lists are non-ontology by design; a term ID there is an error.
+- Retired `corpus.type` tokens (`binary`, `integer`, `numeric`, `character`) are
+  reported together with their replacement.
+
+When `metaharmonizer` is importable (for example with
+`PYTHONPATH=~/OmicsMLRepo/MetaHarmonizer/src`), each table is also parsed with
+`read_schema_table()`. Its warnings are reported, and so is any label list it
+would drop.
+
+Exit status: `0` clean, `1` errors, `2` usage or I/O error.
