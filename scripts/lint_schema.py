@@ -24,6 +24,8 @@ The conventions (see docs/target_schema.md for the full guide):
 * ``static.enum``: a ``|`` list of CURIEs, the same length and order as the
   labels. A label without an ID gets an empty slot (``NCIT:C1||NCIT:C3``) or
   ``NA``.
+  A ``static_enum`` row may also list IDs with ``allowedvalues`` left ``NA``;
+  the labels then come from the ontology.
 * ``dynamic.enum``: a ``|`` list of upper-case CURIEs, set exactly when the
   field is ``dynamic_enum``. ``dynamic.enum.property`` is ``descendant`` or
   ``children``.
@@ -229,8 +231,11 @@ def check_row(rep: Report, r: dict, seen: set):
     if av is not None:
         if types & LIST_TYPES:
             if is_na(av):
-                kind = "static_enum" if "static_enum" in types else "custom_enum"
-                rep.err(w, f"{kind} field has no allowedvalues labels")
+                # A static_enum row may list term IDs without labels: the
+                # labels then come from the ontology (cmd treatment).
+                if not ("static_enum" in types and se is not None and not is_na(se)):
+                    kind = "static_enum" if "static_enum" in types else "custom_enum"
+                    rep.err(w, f"{kind} field has no allowedvalues labels")
             else:
                 labels = tokens(av)
                 if any(not t for t in labels):

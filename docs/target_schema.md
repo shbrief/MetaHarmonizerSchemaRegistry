@@ -107,9 +107,9 @@ export and curators rely on them.
 | `delimiter` | No | The separator the curated data uses in a multi-valued cell (`;` or `<;>`), `NA` otherwise |
 | `separator` | No | A multi-character token for key:value pairs, else `NA` |
 | `description` | No | Definition of the field, ideally the ontology definition |
-| `corpus.type` | Only the exact value `static_enum` (see [§5](#5-closed-value-lists-allowedvalues-staticenum)) | **Required.** Decides how `allowedvalues` is read. See below. |
+| `corpus.type` | Yes (see [§5](#5-closed-value-lists-allowedvalues-staticenum)) | **Required.** Decides how `allowedvalues` is read. See below. |
 | `allowedvalues` | Yes | Depends on `corpus.type` |
-| `static.enum` | Yes, when `corpus.type` is exactly `static_enum` | One CURIE per label, same order |
+| `static.enum` | Yes, when `corpus.type` includes `static_enum` | One CURIE per label, same order |
 | `dynamic.enum` | **Yes** | `\|` list of root CURIEs (see [§4](#4-ontology-backed-fields-dynamicenum)) |
 | `dynamic.enum.property` | Yes | `descendant` (default) or `children`; applies to all roots |
 
@@ -224,7 +224,9 @@ dna_extraction_kit,custom_enum,PSP Spin Stool DNA Plus Kit|PowerSoil DNA Isolati
    to fill, not a `custom_enum`.
 2. **Keep `static.enum` the same length and order as the labels.** A label
    without an ID gets an empty slot (`NCIT:C1||NCIT:C3`), or the whole cell is
-   `NA`.
+   `NA`. A `static_enum` row may also give IDs with `allowedvalues = NA`; each
+   term is then added as it is, with its ontology label (`treatment`:
+   `NCIT:C41132`).
 3. **Write each label exactly as it should appear in the harmonized output**,
    including case.
 4. **Labels and roots can be combined.** A label that already exists in a root
@@ -234,21 +236,16 @@ dna_extraction_kit,custom_enum,PSP Spin Stool DNA Plus Kit|PowerSoil DNA Isolati
    `T[X1-4]N[X0-3]M[X0-1]` are for validation; MetaHarmonizer does not match
    values against them.
 
-**Current MetaHarmonizer limitations.** The convention is ahead of the parser in
-`schema_vocab.py`. Until it is fixed, these rows lose information in
-`harmonize()` (the lint reports them as "MetaHarmonizer drops this list"):
-
-- **`custom_enum` lists are dropped.** Only an exact `static_enum` row is read
-  as a list. Any other row is checked for regex syntax, and a `|` makes the
-  whole cell look like a pattern.
-- **Compound rows lose their IDs.** `dynamic_enum|static_enum` is not exactly
-  `static_enum`, so `static.enum` is ignored, and a list of two or more labels
-  is dropped as above. A single label (such as `Healthy`) survives without its
-  ID.
-- **Empty ID slots break the pairing.** Empty slots are discarded before labels
-  and IDs are paired, so the counts differ and *all* IDs for the field are
-  dropped with a warning.
-- **Labels are also split on `;`**, which breaks labels such as `t(9;22)`.
+**MetaHarmonizer support.** `harmonize()` (`schema_vocab`) and
+`CombinedCorpusBuilder` read these columns with one parser,
+`metaharmonizer.schema_cells`, which follows this section: `corpus.type`
+decides whether `allowedvalues` is a list, labels are split on `|` only (so
+`t(9;22)` and `CD4+` survive), empty ID slots keep the pairing, and compound
+`dynamic_enum|static_enum` rows keep their IDs. This is in MetaHarmonizer
+PR #108 (`feat/schema-table-corpora`). Older versions drop `custom_enum` lists
+and compound-row IDs, and drop all IDs of a field that has an empty slot; the
+lint reports those rows as "MetaHarmonizer drops this list" when run against
+such a version.
 
 ---
 
