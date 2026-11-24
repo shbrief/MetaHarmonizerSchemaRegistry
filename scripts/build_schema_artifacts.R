@@ -100,8 +100,17 @@ read_schema <- function(path) {
   }
 }
 
+# ---- schema metadata (meta.yaml next to the table) --------------------------
+# Its `version` and `date` become the LinkML `version` and `last_updated_on`, so
+# a rebuild of an unchanged schema is byte-identical.
+read_meta <- function(input) {
+  path <- file.path(dirname(input), "meta.yaml")
+  if (!file.exists(path)) return(list())
+  yaml::read_yaml(path)
+}
+
 # ---- 1. LinkML schema -------------------------------------------------------
-write_linkml <- function(dict, outdir, prefix) {
+write_linkml <- function(dict, outdir, prefix, meta = list()) {
   out <- file.path(outdir, paste0(prefix, ".linkml.yaml"))
   class_name <- paste0(
     toupper(substring(prefix, 1, 1)), substring(prefix, 2), "Record"
@@ -111,9 +120,16 @@ write_linkml <- function(dict, outdir, prefix) {
     schema_id          = paste0("https://w3id.org/omicsmlrepo/", prefix),
     schema_name        = prefix,
     schema_description = paste0(prefix, " schema for the MetaHarmonizer ecosystem"),
+    schema_version     = if (is.null(meta$version)) "1.0.0" else as.character(meta$version),
     class_name         = class_name,
     output_file        = out
   )
+  if (!is.null(meta$date)) {
+    lines <- readLines(out, encoding = "UTF-8")
+    lines <- sub("^last_updated_on: .*$",
+                 sprintf("last_updated_on: '%s'", as.character(meta$date)), lines)
+    writeLines(lines, out, useBytes = TRUE)
+  }
   message("[1/4] LinkML schema         -> ", out)
   out
 }
@@ -202,8 +218,10 @@ main <- function() {
 
   message("Reading schema: ", opts$input)
   dict <- read_schema(opts$input)
+  meta <- read_meta(opts$input)
+  if (length(meta)) message("Schema version: ", meta$version, " (", meta$date, ")")
 
-  write_linkml(dict, opts$outdir, opts$prefix)
+  write_linkml(dict, opts$outdir, opts$prefix, meta)
   ta <- write_target_attrs(dict, opts$outdir, opts$prefix)
   write_allowed_values(dict, opts$outdir, opts$prefix)
   if (!opts$no_alias) {

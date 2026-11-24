@@ -110,6 +110,7 @@ def table_to_linkml_schema(
     schema_description: str | None = None,
     class_name: str = "MetadataRecord",
     output_file: str | None = None,
+    last_updated_on: str | None = None,
 ) -> dict:
     schema: dict = {}
     if schema_id is not None:
@@ -117,7 +118,7 @@ def table_to_linkml_schema(
     if schema_name is not None:
         schema["name"] = schema_name
     schema["version"] = schema_version
-    schema["last_updated_on"] = datetime.now().strftime("%Y-%m-%d")
+    schema["last_updated_on"] = last_updated_on or datetime.now().strftime("%Y-%m-%d")
     if schema_description is not None:
         schema["description"] = schema_description
     schema["prefixes"] = {
@@ -257,13 +258,30 @@ def table_to_linkml_schema(
     return schema
 
 
-def write_linkml(df: pd.DataFrame, outdir: Path, prefix: str) -> Path:
+def read_meta(schema_dir: Path) -> dict:
+    """The schema's ``meta.yaml`` (version, date, ...), or ``{}`` if there is none.
+
+    Its ``version`` and ``date`` become the LinkML ``version`` and
+    ``last_updated_on``, so a rebuild of an unchanged schema is byte-identical.
+    """
+    path = schema_dir / "meta.yaml"
+    if not path.exists():
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return yaml.safe_load(fh) or {}
+
+
+def write_linkml(df: pd.DataFrame, outdir: Path, prefix: str,
+                 meta: dict | None = None) -> Path:
+    meta = meta or {}
     out = outdir / f"{prefix}.linkml.yaml"
     class_name = f"{prefix[:1].upper()}{prefix[1:]}Record"
     table_to_linkml_schema(
         df,
         schema_id=f"https://w3id.org/omicsmlrepo/{prefix}",
         schema_name=prefix,
+        schema_version=str(meta.get("version", "1.0.0")),
+        last_updated_on=str(meta["date"]) if meta.get("date") else None,
         schema_description=f"{prefix} schema for the MetaHarmonizer ecosystem",
         class_name=class_name,
         output_file=str(out),
@@ -390,8 +408,11 @@ def main(argv=None) -> int:
 
     print(f"Reading schema: {args.input}", file=sys.stderr)
     df = read_schema(args.input)
+    meta = read_meta(Path(args.input).parent)
+    if meta:
+        print(f"Schema version: {meta.get('version')} ({meta.get('date')})", file=sys.stderr)
 
-    write_linkml(df, outdir, prefix)
+    write_linkml(df, outdir, prefix, meta)
     ta = write_target_attrs(df, outdir, prefix)
     write_allowed_values(df, outdir, prefix)
     if args.no_alias:

@@ -1,0 +1,29 @@
+# Schema metadata. In the same pull request as any change to this schema's
+# table(s), bump `version` and `date` and add a CHANGELOG.md entry; CI checks
+# both. Merging to main tags the commit `<schema>-v<version>`.
+# Bump rules (docs/target_schema.md, "Versioning"): major = a field removed or
+# renamed, an allowed value removed, col.class changed, a field made required,
+# roots narrowed; minor = a field, allowed value or root added, a missing term
+# ID filled in; patch = descriptions and typos that change no value.
+schema: cmd
+version: "0.1.0"
+date: "2026-11-24"
+description: "curatedMetagenomicData harmonized metadata"
+tables:
+  - cmd_schema.csv
+build:            # table -> artifact prefix for build_schema_artifacts.{py,R}
+  cmd_schema.csv: cmd
+lint: report      # report: lint errors are shown; blocking: they fail CI
+source: >-
+  waldronlab/curatedMetagenomicDataCuration
+  inst/extdata/cMD_data_dictionary.csv (Google Sheet "cmd" tab), with scope,
+  unit.of and propagate.study.value added in the registry. Sheet sync stopped
+  2026-11-24; the CSV is now the source of truth.
+ontologies:       # OLS4 version of each ontology the table cites, when `version` was set
+  EFO: "3.96.0"
+  FMA: "5.1.0"
+  HANCESTRO: "2025-10-14"
+  MRO: "2026-11-18"
+  NCIT: "26.02d"
+  SNOMED: "2026-10-21"
+  UBERON: "2026-11-23"
