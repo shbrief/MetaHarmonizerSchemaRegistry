@@ -19,7 +19,7 @@ The conventions (see docs/target_schema.md for the full guide):
   ``custom_enum`` row holds a ``|`` list of labels, a ``regexp`` row holds one
   regex, an ``any`` row holds ``NA`` or ``.+``, and any other row holds ``NA``.
 * Retired ``corpus.type`` tokens are errors with a replacement hint: ``binary``
-  becomes ``static_enum``; ``integer``, ``numeric`` and ``character`` become
+  becomes ``static_enum`` with its labels kept (Yes|No or TRUE|FALSE); ``integer``, ``numeric`` and ``character`` become
   ``regexp``, or ``any`` when there is no pattern.
 * ``static.enum``: a ``|`` list of CURIEs, the same length and order as the
   labels. A label without an ID gets an empty slot (``NCIT:C1||NCIT:C3``) or
@@ -27,7 +27,8 @@ The conventions (see docs/target_schema.md for the full guide):
 * ``dynamic.enum``: a ``|`` list of upper-case CURIEs, set exactly when the
   field is ``dynamic_enum``. ``dynamic.enum.property`` is ``descendant`` or
   ``children``.
-* ``delimiter``: ``<;>`` for multi-valued fields, ``NA`` otherwise.
+* ``delimiter``: ``;`` or ``<;>`` for multi-valued fields, matching the
+  curated data; ``NA`` otherwise.
 
 Optional checks:
 
@@ -76,10 +77,13 @@ CORPUS_TYPES = {"dynamic_enum", "static_enum", "custom_enum", "regexp", "any"}
 ENUM_TYPES = {"dynamic_enum", "static_enum", "custom_enum"}
 LIST_TYPES = {"static_enum", "custom_enum"}  # allowedvalues holds a label list
 PROPERTIES = {"descendant", "children"}
-DATA_DELIMITER = "<;>"
+# Separators a multi-valued data cell may use. The schema's delimiter must match
+# the curated data: cMD uses ";" for most fields and "<;>" for a few.
+DATA_DELIMITERS = {";", "<;>"}
 # Older corpus.type tokens still in the registry, and what replaces them.
 LEGACY_CORPUS_TYPES = {
-    "binary": "static_enum (allowedvalues Yes|No, static.enum NCIT:C49488|NCIT:C49487)",
+    "binary": "static_enum (keep the labels: Yes|No -> NCIT:C49488|NCIT:C49487, "
+              "TRUE|FALSE -> NCIT:C68850|NCIT:C68851)",
     "integer": "regexp (the pattern stays in allowedvalues)",
     "numeric": "regexp (the pattern stays in allowedvalues)",
     "character": "regexp (the pattern stays in allowedvalues)",
@@ -297,8 +301,9 @@ def check_row(rep: Report, r: dict, seen: set):
     # delimiter
     delim = g("delimiter")
     if delim is not None and mv in ("TRUE", "FALSE"):
-        if mv == "TRUE" and delim != DATA_DELIMITER:
-            rep.err(w, f"multi-valued field needs delimiter {DATA_DELIMITER!r} (has {delim!r})")
+        if mv == "TRUE" and delim not in DATA_DELIMITERS:
+            rep.err(w, f"multi-valued field needs a delimiter, one of "
+                       f"{sorted(DATA_DELIMITERS)} matching the curated data (has {delim!r})")
         if mv == "FALSE" and not is_na(delim):
             rep.warn(w, f"single-valued field has delimiter {delim!r}")
 

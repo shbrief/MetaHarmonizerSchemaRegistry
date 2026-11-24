@@ -68,7 +68,7 @@ source values are copied into the output without ontology mapping.
 - **`|` separates list items** in `corpus.type`, `allowedvalues`, `static.enum`
   and `dynamic.enum`. NCIt labels contain `;` (for example `t(9;22)`), and no
   corpus label contains `|`, so `|` is the safe choice. The `delimiter` column
-  describes the *data* cells, which use `<;>`; that is unrelated.
+  describes the *data* cells (`;` or `<;>`); that is unrelated.
 
 Example, using rows from `cmd_schema.csv` and `omicsmlprepo_cbio_schema.csv`
 (other columns omitted):
@@ -104,7 +104,7 @@ export and curators rely on them.
 | `unit.of` | No | Optional; the field whose unit this field records |
 | `propagate.study.value` | No | Optional; `TRUE` when a study-level value applies to every sample, else `FALSE` |
 | `multiplevalues` | Yes | `TRUE` or `FALSE`, never `NA` (see [§6](#6-multi-valued-fields)) |
-| `delimiter` | No | `<;>` for a multi-valued field, `NA` otherwise |
+| `delimiter` | No | The separator the curated data uses in a multi-valued cell (`;` or `<;>`), `NA` otherwise |
 | `separator` | No | A multi-character token for key:value pairs, else `NA` |
 | `description` | No | Definition of the field, ideally the ontology definition |
 | `corpus.type` | Only the exact value `static_enum` (see [§5](#5-closed-value-lists-allowedvalues-staticenum)) | **Required.** Decides how `allowedvalues` is read. See below. |
@@ -127,8 +127,9 @@ export and curators rely on them.
   with roots plus a few extra labels.
 - `regexp` cannot be combined with the enum types, and `static_enum` cannot be
   combined with `custom_enum`.
-- **Retired tokens:** `binary` becomes `static_enum` with
-  `Yes|No` → `NCIT:C49488|NCIT:C49487`. `integer`, `numeric` and `character`
+- **Retired tokens:** `binary` becomes `static_enum` and keeps its labels:
+  `Yes|No` → `NCIT:C49488|NCIT:C49487`, `TRUE|FALSE` →
+  `NCIT:C68850|NCIT:C68851`. `integer`, `numeric` and `character`
   become `regexp` when there is a pattern, otherwise `any`. The validators treat
   `static_enum`, `custom_enum` and `binary` alike, and take the type check from
   `col.class`, so validation does not change.
@@ -254,7 +255,8 @@ dna_extraction_kit,custom_enum,PSP Spin Stool DNA Plus Kit|PowerSoil DNA Isolati
 ## 6. Multi-valued fields
 
 - **Set `multiplevalues = TRUE`** when one sample can carry several values
-  (several diseases, treatments or body sites), and set `delimiter = <;>`.
+  (several diseases, treatments or body sites), and set `delimiter` to the
+  separator the curated data uses (`;` or `<;>`).
   - When several source columns map to such a field, MetaHarmonizer keeps the
     union of their terms.
   - For a single-valued field, MetaHarmonizer keeps only the best-scoring
@@ -346,7 +348,7 @@ vocabulary resolved to no terms (these become passthrough fields).
 - [ ] Dotted lower-case headers in the canonical order
 - [ ] Every `col.name` is non-empty and unique
 - [ ] `col.class` is `character`, `integer`, `numeric`, `logical` or `date`
-- [ ] `multiplevalues` is `TRUE`/`FALSE`; multi-valued fields have `delimiter = <;>`
+- [ ] `multiplevalues` is `TRUE`/`FALSE`; multi-valued fields have the data's `delimiter` (`;` or `<;>`)
 - [ ] Every row has a `corpus.type`, with `|`-joined current tokens only
 - [ ] Ontology fields have upper-case, non-obsolete `|`-separated roots and a
       `dynamic.enum.property`

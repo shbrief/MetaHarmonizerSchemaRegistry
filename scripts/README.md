@@ -163,7 +163,7 @@ python scripts/lint_schema.py --strict        # warnings fail too
 It checks the file format, the header names and order, the closed vocabularies
 (`col.class`, `unique`, `required`, `multiplevalues`, `corpus.type`, and
 `dynamic.enum.property`), the `|` lists, CURIE syntax, how `static.enum` codes
-pair with labels, and the `<;>` data delimiter.
+pair with labels, and the data delimiter (`;` or `<;>`).
 
 - `static_enum` lists should have term IDs; a missing ID is a warning.
 - `custom_enum` lists are non-ontology by design; a term ID there is an error.
