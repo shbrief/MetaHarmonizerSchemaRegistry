@@ -18,7 +18,8 @@ schema/
   omicsmlrepo_cbio/      cBioPortal via the OmicsMLRepo data dictionary
   curatedmetagenomicdata/ cMD data dictionary (from waldronlab)
   gdc/                   GDC columns (built from observed values, no LinkML source)
-scripts/                 the artifact builders and validators (R + Python)
+scripts/                 the artifact builders, validators and lint (R + Python)
+docs/target_schema.md    how to prepare a schema table (the convention + what MetaHarmonizer reads)
 get_schema_to_deploy.qmd how each schema table is pulled and how artifacts are built
 ```
 
@@ -107,6 +108,10 @@ Shared flags: `--schema`, `--data` (omit for a schema self-check), `--strict`.
 Exit status: `0` valid, `1` invalid, `2` usage/IO error.
 
 ## Schema table conventions
+
+The full convention, and what MetaHarmonizer reads from each column, is in
+[docs/target_schema.md](docs/target_schema.md). `scripts/lint_schema.py`
+enforces it. The rules below are the ones the artifact builders depend on.
 
 - **Delimiter.** `|` is the single list delimiter across the schema: enum
   `allowedvalues`, positional `static.enum` ids, multi-node `dynamic.enum` roots,

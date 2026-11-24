@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Lint registry schema tables against the schema-table conventions.
 
-The conventions (see "Schema table conventions" in the README):
+The conventions (see docs/target_schema.md for the full guide):
 
 * File: UTF-8, comma-separated CSV written by ``write.csv(row.names = FALSE)``,
   ``NA`` for empty cells.

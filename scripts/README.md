@@ -151,6 +151,8 @@ Two narrative walk-throughs of the same checks live in
 
 ## `lint_schema.py` — check schema tables against the conventions
 
+The conventions are described in [docs/target_schema.md](../docs/target_schema.md).
+
 ```bash
 python scripts/lint_schema.py                 # every schema/*/*_schema*.csv
 python scripts/lint_schema.py --quiet         # per-file counts only
