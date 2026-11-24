@@ -16,7 +16,8 @@ This guide covers two things:
   when that happens.
 
 For the current state of each table, run the lint (see [§8](#8-check-the-table))
-rather than relying on a list here.
+rather than relying on a list here. How schemas are versioned and released is
+in [§9](#9-versioning).
 
 ---
 
@@ -59,7 +60,9 @@ source values are copied into the output without ontology mapping.
   dynamic.enum, dynamic.enum.property
   ```
 
-  `scope` and `unit.of` are optional. Header names must match exactly:
+  `scope`, `unit.of` and `propagate.study.value` (between `unit.of` and
+  `multiplevalues`) are optional. `Rscript scripts/format_schema.R` puts the
+  columns in this order for you. Header names must match exactly:
   `dynamic_enum` or `Separater` are not recognized, and an unrecognized column
   is ignored.
 - **`|` separates list items** in `corpus.type`, `allowedvalues`, `static.enum`
@@ -99,6 +102,7 @@ export and curators rely on them.
 | `required` | No | `required` or `optional` |
 | `scope` | No | Optional, for example `sample` or `study` |
 | `unit.of` | No | Optional; the field whose unit this field records |
+| `propagate.study.value` | No | Optional; `TRUE` when a study-level value applies to every sample, else `FALSE` |
 | `multiplevalues` | Yes | `TRUE` or `FALSE`, never `NA` (see [§6](#6-multi-valued-fields)) |
 | `delimiter` | No | `<;>` for a multi-valued field, `NA` otherwise |
 | `separator` | No | A multi-character token for key:value pairs, else `NA` |
@@ -352,3 +356,33 @@ vocabulary resolved to no terms (these become passthrough fields).
 - [ ] Patterns are in `regexp` rows
 - [ ] `description` is filled in
 - [ ] `scripts/lint_schema.py` passes, and `read_schema_table()` output looks right
+- [ ] `format_schema.R` run, artifacts rebuilt, `meta.yaml` version bumped, CHANGELOG entry added
+
+---
+
+## 9. Versioning
+
+Each schema directory has a `meta.yaml` (schema id, `version`, `date`, tables,
+lint mode, ontology versions) and a `CHANGELOG.md`. In the same pull request as
+any change to a table:
+
+1. Run `Rscript scripts/format_schema.R` and rebuild the artifacts.
+2. Bump `version` and set `date` in `meta.yaml`:
+
+   | Bump | When |
+   |---|---|
+   | Major | A field removed or renamed, an allowed value removed, `col.class` changed, a field made required, roots narrowed |
+   | Minor | A field, allowed value or root added; a missing term ID filled in |
+   | Patch | Descriptions and typos that change no value |
+
+3. Add a `## [x.y.z] - YYYY-MM-DD` entry to `CHANGELOG.md`.
+
+CI (`scripts/check_schemas.py`) fails if a schema changed without a version
+bump or CHANGELOG entry. After the checks pass on `main`, CI tags the commit
+`<schema>-v<version>` and publishes a GitHub release. Consumers should read a
+schema from a tag, not from `main`.
+
+Versions below 1.0.0 may still change in breaking ways. A schema reaches 1.0.0
+once its table passes the lint; its `meta.yaml` then switches to
+`lint: blocking`.
+

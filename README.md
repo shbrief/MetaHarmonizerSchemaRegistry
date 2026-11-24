@@ -14,20 +14,22 @@ means the schemas and their derived artifacts stay versioned together.
 
 ```
 schema/
-  cbioportal/            cBioPortal attributes (from Google Sheet)
+  cbioportal/            cBioPortal attributes
   omicsmlrepo_cbio/      cBioPortal via the OmicsMLRepo data dictionary
   curatedmetagenomicdata/ cMD data dictionary (from waldronlab)
   gdc/                   GDC columns (built from observed values, no LinkML source)
 scripts/                 the artifact builders, validators and lint (R + Python)
 docs/target_schema.md    how to prepare a schema table (the convention + what MetaHarmonizer reads)
-get_schema_to_deploy.qmd how each schema table is pulled and how artifacts are built
+.github/workflows/       CI: schema checks on every PR/push, version tags on main
 ```
 
 Within each `schema/<source>/` directory:
 
 | File | What it is | Produced by |
 |------|-----------|-------------|
-| `<prefix>_schema.csv` | **Source schema table** (comma-separated CSV, `write.csv()`) | pulled from a Google Sheet / data dictionary (see the `.qmd`) |
+| `<prefix>_schema.csv` | **Source schema table, the source of truth** (comma CSV, `write.csv()`) | edited by pull request |
+| `meta.yaml` | Schema id, version, date, tables, lint mode, ontology versions | edited with every schema change |
+| `CHANGELOG.md` | One entry per version | edited with every schema change |
 | `<prefix>.linkml.yaml` | LinkML schema — validation + metacurator | `build_schema_artifacts.{R,py}` |
 | `<prefix>_target_attrs.csv` | SchemaMapper target schema (`field_name,is_numeric_field`) | `build_schema_artifacts.{R,py}` |
 | `<prefix>_target_attrs_allowed_values.json` | SchemaMapper value dictionary (enum fields → `{field: [values]}`) | `build_schema_artifacts.{R,py}` |
@@ -40,19 +42,21 @@ Within each `schema/<source>/` directory:
 
 ## Workflow
 
-The end-to-end pipeline — pull each schema table, build the artifacts, validate
-data against a schema — is documented in
-[get_schema_to_deploy.qmd](get_schema_to_deploy.qmd), with per-script usage in
-[scripts/README.md](scripts/README.md). The short version:
+Per-script usage is in [scripts/README.md](scripts/README.md). The short version:
 
-### 1. Get the schema table
+### 1. Edit the schema table
 
-Each schema originates in a Google Sheet or an upstream data dictionary and is
-written to `<prefix>_schema.csv` with R's `write.csv(..., row.names = FALSE)`
-(comma-separated — the format every downstream script and MetaHarmonizer's
-`harmonize(schema_table=)` expect; the scripts still read the old
-space-separated `write.table()` layout). See the
-`get_schema_to_deploy.qmd` chunks for the specific sources and column subset.
+**The `<prefix>_schema.csv` files in this repository are the source of truth**
+(since 2026-11-24). The Google Sheets they used to be pulled from are archived,
+and the sync code is commented out. To change a schema:
+
+1. On a branch, edit the table (see [docs/target_schema.md](docs/target_schema.md)
+   for the convention), then run `Rscript scripts/format_schema.R` so the file
+   stays in canonical form.
+2. Rebuild its artifacts (step 2 below) and run `python scripts/check_schemas.py`.
+3. Bump `version` and `date` in the schema's `meta.yaml` and add a
+   `CHANGELOG.md` entry ([Versioning](#versioning)).
+4. Open a pull request. CI runs the same checks.
 
 ### 2. Build the downstream artifacts
 
@@ -107,6 +111,27 @@ python scripts/schema_validation.py \
 Shared flags: `--schema`, `--data` (omit for a schema self-check), `--strict`.
 Exit status: `0` valid, `1` invalid, `2` usage/IO error.
 
+## Versioning
+
+Each schema is versioned on its own with [SemVer](https://semver.org/). The
+version lives in `schema/<source>/meta.yaml`, and each version is tagged
+`<schema>-v<version>` (for example `cmd-v0.1.0`) with a GitHub release that
+carries the schema's files and its CHANGELOG entry. The tag is created by CI
+after the checks pass on `main`; nobody tags by hand.
+
+| Bump | When |
+|---|---|
+| Major | A field removed or renamed, an allowed value removed, `col.class` changed, a field made required, roots narrowed |
+| Minor | A field, allowed value or root added; a missing term ID filled in |
+| Patch | Descriptions and typos that change no value |
+
+Versions below 1.0.0 may still change in breaking ways. Each schema reaches
+1.0.0 once its table passes the lint, at which point its `meta.yaml` switches to
+`lint: blocking`.
+
+**Consumers pin a tag**, never `main`, for example
+`https://raw.githubusercontent.com/shbrief/MetaHarmonizerSchemaRegistry/cmd-v0.1.0/schema/curatedmetagenomicdata/cmd_schema.csv`.
+
 ## Schema table conventions
 
 The full convention, and what MetaHarmonizer reads from each column, is in
@@ -128,7 +153,7 @@ enforces it. The rules below are the ones the artifact builders depend on.
 
 ## Dependencies
 
-- **R:** `OmicsMLRepoCuration`, `jsonlite` (+ `MetaHarmonizerR` for the alias step).
+- **R:** `OmicsMLRepoCuration`, `jsonlite`, `yaml` (+ `MetaHarmonizerR` for the alias step). `format_schema.R` needs base R only.
 - **Python:** `pandas`, `pyyaml` (+ `metaharmonizer` for the alias step).
 
 The R path delegates the LinkML build to `OmicsMLRepoCuration::tableToLinkmlSchema`;

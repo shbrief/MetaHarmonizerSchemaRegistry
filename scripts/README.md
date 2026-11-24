@@ -176,3 +176,48 @@ When `metaharmonizer` is importable (for example with
 would drop.
 
 Exit status: `0` clean, `1` errors, `2` usage or I/O error.
+
+## `format_schema.R` — keep tables in canonical form
+
+```bash
+Rscript scripts/format_schema.R            # rewrite every schema/*/*_schema*.csv
+Rscript scripts/format_schema.R PATH       # just this table
+Rscript scripts/format_schema.R --check    # exit 1 if any table would change (CI)
+```
+
+It reorders columns to the canonical order, writes empty cells as `NA`, and
+writes the file with `write.csv(row.names = FALSE)`. It never changes a value.
+Run it after editing a table by hand or in a spreadsheet program. Base R only.
+
+## `check_schemas.py` — release checks (what CI runs)
+
+```bash
+python scripts/check_schemas.py                      # meta, parse, artifacts, lint
+python scripts/check_schemas.py --base origin/main   # plus the version check
+python scripts/check_schemas.py --skip-artifacts     # without rebuilding
+```
+
+For every `schema/*/meta.yaml` it checks that:
+
+- `meta.yaml` is complete (`schema`, SemVer `version`, ISO `date`, `tables`,
+  `build`, `lint`);
+- MetaHarmonizer's `read_schema_table()` reads each table (when `metaharmonizer`
+  is importable, for example with `PYTHONPATH=~/OmicsMLRepo/MetaHarmonizer/src`);
+- the committed `.linkml.yaml`, `_target_attrs.csv` and
+  `_target_attrs_allowed_values.json` equal a fresh
+  `build_schema_artifacts.py --no-alias` build, byte for byte;
+- `lint_schema.py` passes. With `lint: report` in `meta.yaml` the errors are
+  only shown; with `lint: blocking` they fail the check;
+- with `--base`: when anything in the schema's directory changed (other than
+  `CHANGELOG.md`/`README.md`), `version` went up and `CHANGELOG.md` has a
+  `## [<version>]` entry.
+
+The builders take the LinkML `version` and `last_updated_on` from `meta.yaml`,
+which is what makes a rebuild byte-identical. Build with the Python builder:
+the R builder (via `OmicsMLRepoCuration::tableToLinkmlSchema`) does not write
+the `scope`, `unit_of` and `propagate_study_value` annotations yet, so its cMD
+output differs.
+
+`.github/workflows/schemas.yml` runs `format_schema.R --check` and
+`check_schemas.py` on every pull request and push to `main`. After they pass on
+`main`, it tags each new `<schema>-v<version>` and publishes a GitHub release.

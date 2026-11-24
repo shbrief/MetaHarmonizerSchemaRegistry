@@ -1,0 +1,111 @@
+# Checks every schema on pull requests and pushes to main, and tags each new
+# schema version after the checks pass on main.
+#
+#   check: table format (format_schema.R --check), then check_schemas.py:
+#          meta.yaml, MetaHarmonizer read_schema_table(), artifacts up to date,
+#          lint (blocking only for schemas with `lint: blocking`), and the
+#          version bump + CHANGELOG entry for every schema that changed.
+#   tag:   on main only. For each schema/*/meta.yaml whose <schema>-v<version>
+#          tag does not exist yet, tag the commit and publish a GitHub release
+#          with that schema's files and its CHANGELOG entry.
+name: schemas
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Only src/ is needed: schema_vocab.read_schema_table() imports pandas
+      # alone, so the heavy MetaHarmonizer dependencies are not installed.
+      - uses: actions/checkout@v4
+        with:
+          repository: shbrief/MetaHarmonizer
+          path: .metaharmonizer
+          sparse-checkout: src
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pandas pyyaml
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - name: Table format
+        run: Rscript scripts/format_schema.R --check
+
+      - name: Schema checks
+        env:
+          PYTHONPATH: ${{ github.workspace }}/.metaharmonizer/src
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.base_ref }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          base=""
+          if [ "$EVENT" = "pull_request" ]; then
+            base="origin/$PR_BASE"
+          elif [ "$EVENT" = "push" ] && [ -n "$PUSH_BEFORE" ] \
+               && ! echo "$PUSH_BEFORE" | grep -q '^0*$' \
+               && git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
+            base="$PUSH_BEFORE"
+          fi
+          if [ -n "$base" ]; then
+            python scripts/check_schemas.py --base "$base"
+          else
+            python scripts/check_schemas.py
+          fi
+
+  tag:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pyyaml
+
+      - name: Tag new schema versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for meta in schema/*/meta.yaml; do
+            dir=$(dirname "$meta")
+            tag=$(python -c 'import sys, yaml; m = yaml.safe_load(open(sys.argv[1])); print(m["schema"] + "-v" + str(m["version"]))' "$meta")
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              echo "$tag exists"
+              continue
+            fi
+            version=${tag##*-v}
+            # This version's CHANGELOG section, without its heading.
+            awk -v v="$version" '
+              $0 ~ "^## \\[" v "\\]" {on = 1; next}
+              on && /^## \[/ {exit}
+              on {print}
+            ' "$dir/CHANGELOG.md" > notes.md
+            git tag -a "$tag" -m "$tag"
+            git push origin "$tag"
+            gh release create "$tag" --title "$tag" --notes-file notes.md \
+              --latest=false --verify-tag \
+              $(git ls-files "$dir" | grep -E '\.(csv|ya?ml|json)$')
+            echo "created $tag"
+          done
