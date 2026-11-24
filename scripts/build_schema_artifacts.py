@@ -80,10 +80,18 @@ def _is_enum_corpus_type(ct) -> bool:
 
 
 def read_schema(path: str) -> pd.DataFrame:
-    """Read the registry's write.table() output: space-separated, quoted."""
+    """Read a registry schema table.
+
+    Schema tables are comma-separated CSV (R ``write.csv()``). Files in the
+    legacy ``write.table()`` layout (space-separated, quoted) are still read,
+    so an un-migrated copy keeps working.
+    """
+    with open(path, encoding="utf-8") as fh:
+        header = fh.readline()
+    sep = "," if re.match(r'^\s*"?[^",]*"?\s*,', header) else " "
     return pd.read_csv(
         path,
-        sep=" ",
+        sep=sep,
         quotechar='"',
         skipinitialspace=True,
         keep_default_na=True,

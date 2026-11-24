@@ -58,12 +58,19 @@ parse_args <- function(args) {
 }
 
 # ---- readers ----------------------------------------------------------------
-# The registry writes schemas with write.table() (space-separated, quoted), so
-# read.table() -- not read.csv() -- is the correct reader. check.names=FALSE
-# keeps the dotted descriptor names (col.name, col.class, ...) intact.
+# Schema tables are comma-separated CSV (write.csv()). Files still in the
+# legacy write.table() layout (space-separated, quoted) are detected from the
+# header line and read with read.table(). check.names=FALSE keeps the dotted
+# column names (col.name, col.class, ...) intact.
 read_schema_table <- function(path) {
-  read.table(path, header = TRUE, stringsAsFactors = FALSE,
-             na.strings = "NA", check.names = FALSE)
+  header <- readLines(path, n = 1L, warn = FALSE)
+  if (grepl('^\\s*"?[^",]*"?\\s*,', header)) {
+    read.csv(path, stringsAsFactors = FALSE, na.strings = "NA",
+             check.names = FALSE)
+  } else {
+    read.table(path, header = TRUE, stringsAsFactors = FALSE,
+               na.strings = "NA", check.names = FALSE)
+  }
 }
 
 # Data files are ordinary comma CSVs; check.names=FALSE preserves field names

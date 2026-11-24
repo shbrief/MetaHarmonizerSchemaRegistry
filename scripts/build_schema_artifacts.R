@@ -85,12 +85,19 @@ is_enum_corpus_type <- function(ct) {
 }
 
 # ---- 0. read the schema table ----------------------------------------------
-# The registry writes these with write.table() (space-separated, quoted), so
-# read.table() -- not read.csv() -- is the correct reader. check.names=FALSE
-# keeps the dotted column names (col.name, col.class, ...) intact.
+# Schema tables are comma-separated CSV (write.csv()). Files still in the
+# legacy write.table() layout (space-separated, quoted) are detected from the
+# header line and read with read.table(). check.names=FALSE keeps the dotted
+# column names (col.name, col.class, ...) intact.
 read_schema <- function(path) {
-  read.table(path, header = TRUE, stringsAsFactors = FALSE,
-             na.strings = "NA", check.names = FALSE)
+  header <- readLines(path, n = 1L, warn = FALSE)
+  if (grepl('^\\s*"?[^",]*"?\\s*,', header)) {
+    read.csv(path, stringsAsFactors = FALSE, na.strings = "NA",
+             check.names = FALSE)
+  } else {
+    read.table(path, header = TRUE, stringsAsFactors = FALSE,
+               na.strings = "NA", check.names = FALSE)
+  }
 }
 
 # ---- 1. LinkML schema -------------------------------------------------------

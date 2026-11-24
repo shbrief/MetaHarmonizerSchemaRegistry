@@ -2,7 +2,7 @@
 
 `build_schema_artifacts.R` and `build_schema_artifacts.py` are equivalent
 implementations that turn a MetaHarmonizer schema table (the
-`write.table()`-formatted CSV produced in `intro.qmd`, e.g.
+comma-separated CSV written with `write.csv()` in `get_schema_to_deploy.qmd`, e.g.
 `schema/cbioportal/cbioportal_schema.csv`) into the downstream artifacts the
 ecosystem consumes:
 

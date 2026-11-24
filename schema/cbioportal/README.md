@@ -5,9 +5,10 @@ one another in the "newer replaces older" sense — they differ in *provenance* 
 in *breadth*, and each one is the right input for a different job. Only one of
 them currently has derived artifacts built from it.
 
-All three use the registry's schema-table format: `write.table()` output —
-space-separated, character cells quoted, bare `NA`/`FALSE` — read by
-`scripts/build_schema_artifacts.{R,py}` and `scripts/schema_validation.{R,py}`.
+All three use the registry's schema-table format: comma-separated CSV written
+by `write.csv(..., row.names = FALSE)`, with `NA` for empty cells. It is read by
+`scripts/build_schema_artifacts.{R,py}`, `scripts/schema_validation.{R,py}` and
+MetaHarmonizer's `harmonize(schema_table=)`.
 
 ## At a glance
 

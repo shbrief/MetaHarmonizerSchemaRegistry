@@ -63,12 +63,16 @@ def _isna(v) -> bool:
 
 
 def read_schema(path: str) -> dict:
-    """Turn a *_schema.csv (write.table format) into field -> validation rules.
+    """Turn a *_schema.csv (comma CSV; legacy write.table layout also read)
+    into field -> validation rules.
 
     Mirrors OmicsMLRepoCuration::tableToYamlSchema: `allowedvalues` is split into
     an enum list when `corpus.type` is static/custom/binary, else kept as a regex.
     """
-    df = pd.read_csv(path, sep=" ", quotechar='"', skipinitialspace=True,
+    with open(path, encoding="utf-8") as fh:
+        header = fh.readline()
+    sep = "," if re.match(r'^\s*"?[^",]*"?\s*,', header) else " "
+    df = pd.read_csv(path, sep=sep, quotechar='"', skipinitialspace=True,
                      keep_default_na=True, na_values=["NA"])
     schema: dict = {}
     for _, row in df.iterrows():
