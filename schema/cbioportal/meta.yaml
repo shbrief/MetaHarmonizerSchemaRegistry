@@ -9,10 +9,11 @@ schema: cbioportal
 version: "0.1.0"
 date: "2026-11-24"
 description: "cBioPortal clinical attributes"
+# cbioportal_schema_internal.csv is a working list: kept here, but not
+# linted, versioned or released.
 tables:
   - cbioportal_schema.csv
   - cbioportal_schema_clinical_only.csv
-  - cbioportal_schema_internal.csv
 build:            # table -> artifact prefix for build_schema_artifacts.{py,R}
   cbioportal_schema.csv: cbioportal
 lint: report      # report: lint errors are shown; blocking: they fail CI

@@ -106,6 +106,6 @@ jobs:
             git push origin "$tag"
             gh release create "$tag" --title "$tag" --notes-file notes.md \
               --latest=false --verify-tag \
-              $(git ls-files "$dir" | grep -E '\.(csv|ya?ml|json)$')
+              $(python scripts/release_assets.py "$meta")
             echo "created $tag"
           done
