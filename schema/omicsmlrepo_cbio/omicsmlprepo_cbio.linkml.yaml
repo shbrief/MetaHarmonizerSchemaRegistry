@@ -1,7 +1,7 @@
 id: https://w3id.org/omicsmlrepo/omicsmlprepo_cbio
 name: omicsmlprepo_cbio
 version: 1.0.0
-last_updated_on: '2026-07-01'
+last_updated_on: '2026-11-23'
 description: omicsmlprepo_cbio schema for the MetaHarmonizer ecosystem
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -30,7 +30,7 @@ classes:
     - cancer_type_detailed
     - country
     - curation_id
-    - disease_metastasic_site
+    - disease_metastatic_site
     - disease_metastasis
     - disease_type
     - histological_subtype
@@ -65,10 +65,8 @@ classes:
 slots:
   age_at_death:
     description: The age at which death occurred. Unit is a year.
-    range: age_at_death_enum
+    range: float
     pattern: '[0-9]+'
-    comments:
-    - 'Values should be direct children of: HANCESTRO:0004'
   age_at_diagnosis:
     description: The age of an individual at the time of initial pathologic diagnosis.
     range: float
@@ -105,18 +103,24 @@ slots:
     description: Named locations of or within the body. The anatomical location(s)
       affected by the patient's disease/condition/cancer, often the site from which
       the sample was derived
-    range: string
+    range: body_site_enum
     multivalued: true
+    comments:
+    - 'Values should be descendants of: NCIT:C12219'
   cancer_type:
     description: A type(s) of cancer (relevant to the sample) which the patient has
       been diagnosed with
-    range: string
+    range: cancer_type_enum
     multivalued: true
+    comments:
+    - 'Values should be descendants of: NCIT:C3262'
   cancer_type_detailed:
     description: Detailed information which elaborates on the corresponding curated_cancer_type
       value
-    range: string
+    range: cancer_type_detailed_enum
     multivalued: true
+    comments:
+    - 'Values should be descendants of: NCIT:C3262'
   country:
     description: Country where subject lives and/or data was collected
     range: country_enum
@@ -127,7 +131,7 @@ slots:
     range: string
     required: true
     identifier: true
-  disease_metastasic_site:
+  disease_metastatic_site:
     description: .nan
     range: string
   disease_metastasis:
@@ -141,17 +145,21 @@ slots:
     range: disease_type_enum
     multivalued: true
     comments:
-    - 'Values should be descendants of: NCIT:C7057, EFO_0000408'
+    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
   histological_subtype:
     description: .nan
-    range: string
+    range: histological_subtype_enum
+    comments:
+    - 'Values should be descendants of: NCIT:C41009, NCIT:C7057, NCIT:C21599'
   location:
     description: Location (more specific than 'country') where subject lives and/or
       data was collected
     range: string
   molecular_subtype:
     description: .nan
-    range: string
+    range: molecular_subtype_enum
+    comments:
+    - 'Values should be descendants of: NCIT:C2950, NCIT:C97926, NCIT:C3367, NCIT:C16612'
   oncotree_code:
     description: A unique identifier assigned to a specific cancer type within the
       open-source OncoTree classification system.
@@ -188,8 +196,10 @@ slots:
       embryos, and body excretory substances. Origin of the specimen, including source
       of the cells, primary/metastatic/recurrent status, and anatomical location of
       derivation
-    range: string
+    range: specimen_type_enum
     multivalued: true
+    comments:
+    - 'Values should be descendants of: NCIT:C19157, NCIT:C12219'
   study_design:
     description: 'A plan detailing how a study will be performed in order to represent
       the phenomenon under examination, to answer the research questions that have
@@ -210,7 +220,7 @@ slots:
     required: true
     multivalued: true
     comments:
-    - 'Values should be descendants of: NCIT:C7057, EFO_0000408'
+    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
   treatment_dose:
     description: A quantity of an agent (such as substance or energy) administered,
       taken, or absorbed at one time. Individual dose amount
@@ -240,8 +250,10 @@ slots:
   treatment_name:
     description: The literal identifier of a therapy. Specific name of drug/medication/treatment/surgical
       procedure
-    range: string
+    range: treatment_name_enum
     multivalued: true
+    comments:
+    - 'Values should be descendants of: NCIT:C1909, NCIT:C25218'
   treatment_notes:
     description: miscellaneous treatment information that does not fit into the other
       categories
@@ -267,8 +279,10 @@ slots:
     multivalued: true
   treatment_type:
     description: Broad treatment category
-    range: string
+    range: treatment_type_enum
     multivalued: true
+    comments:
+    - 'Values should be descendants of: NCIT:C1909, NCIT:C25218'
   tumor_staging_ajcc:
     description: American Joint Committee on Cancer (tumor staging) (SNOMED:258236004).
       A system to describe the amount and spread of cancer in a patient's body
@@ -284,15 +298,6 @@ slots:
       in time.
     range: string
 enums:
-  age_at_death_enum:
-    include:
-    - reachable_from:
-        source_ontology: obo:hancestro
-        source_nodes:
-        - HANCESTRO:0004
-        relationship_types:
-        - rdfs:subClassOf
-        is_direct: true
   age_group_enum:
     permissible_values:
       Newborn:
@@ -325,6 +330,33 @@ enums:
         relationship_types:
         - rdfs:subClassOf
         is_direct: false
+  body_site_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C12219
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+  cancer_type_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C3262
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+  cancer_type_detailed_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C3262
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
   country_enum:
     include:
     - reachable_from:
@@ -344,9 +376,62 @@ enums:
         - rdfs:subClassOf
         is_direct: false
     - reachable_from:
-        source_ontology: obo:efo_0000408
+        source_ontology: obo:mondo
         source_nodes:
-        - EFO_0000408
+        - MONDO:0000001
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+  histological_subtype_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C41009
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C7057
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C21599
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+  molecular_subtype_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C2950
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C97926
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C3367
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C16612
         relationship_types:
         - rdfs:subClassOf
         is_direct: false
@@ -360,6 +445,22 @@ enums:
         meaning: SNOMED:8517006
       Never smoked tobacco (finding):
         meaning: SNOMED:266919005
+  specimen_type_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C19157
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C12219
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
   target_condition_enum:
     include:
     - reachable_from:
@@ -370,9 +471,41 @@ enums:
         - rdfs:subClassOf
         is_direct: false
     - reachable_from:
-        source_ontology: obo:efo_0000408
+        source_ontology: obo:mondo
         source_nodes:
-        - EFO_0000408
+        - MONDO:0000001
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+  treatment_name_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C1909
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C25218
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+  treatment_type_enum:
+    include:
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C1909
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+    - reachable_from:
+        source_ontology: obo:ncit
+        source_nodes:
+        - NCIT:C25218
         relationship_types:
         - rdfs:subClassOf
         is_direct: false

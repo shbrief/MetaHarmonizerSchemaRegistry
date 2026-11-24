@@ -11,7 +11,7 @@ cancer_type,no
 cancer_type_detailed,no
 country,no
 curation_id,no
-disease_metastasic_site,no
+disease_metastatic_site,no
 disease_metastasis,no
 disease_type,no
 histological_subtype,no
