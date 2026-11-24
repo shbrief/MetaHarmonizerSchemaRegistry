@@ -215,7 +215,7 @@ For every `schema/*/meta.yaml` it checks that:
 The builders take the LinkML `version` and `last_updated_on` from `meta.yaml`,
 which is what makes a rebuild byte-identical. Build with the Python builder:
 the R builder (via `OmicsMLRepoCuration::tableToLinkmlSchema`) does not write
-the `scope`, `unit_of` and `propagate_study_value` annotations yet, so its cMD
+the `scope`, `unit_of`, `value_of`, `separator` and `propagate_study_value` annotations yet, so its cMD
 output differs.
 
 `.github/workflows/schemas.yml` runs `format_schema.R --check` and

@@ -1,6 +1,6 @@
 id: https://w3id.org/omicsmlrepo/cmd
 name: cmd
-version: 0.1.0
+version: 0.2.0
 last_updated_on: '2026-11-24'
 description: cmd schema for the MetaHarmonizer ecosystem
 prefixes:
@@ -91,8 +91,10 @@ classes:
     - host_species
 slots:
   location:
-    description: Free-text additional location detail (for example city or region).
+    description: Free-text additional location detail (for example city or region);
+      several details are separated by ;.
     range: string
+    multivalued: true
     pattern: .+
     annotations:
       scope: sample
@@ -191,9 +193,12 @@ slots:
     pattern: ^\d+(\.\d+)?$
     annotations:
       scope: sample
+      value_of: probing_pocket_depth
   ncbi_accession:
-    description: NCBI SRA/ENA accession(s) associated with the sample or run.
+    description: NCBI SRA/ENA accession(s) associated with the sample or run; several
+      accessions are separated by ;.
     range: string
+    multivalued: true
     pattern: '[ES]R[SR][0-9]+'
     annotations:
       scope: sample
@@ -308,26 +313,26 @@ slots:
   disease:
     description: 'Reported disease or condition term(s) for the participant; use Healthy
       when no target condition is detected. Lookup seed ontology IDs: NCIT:C7057;
-      EFO:0000408. Type: looked_up. Looked up: Yes. Includes child terms: Yes. Existing-dataset-only
+      MONDO:0000001. Type: looked_up. Looked up: Yes. Includes child terms: Yes. Existing-dataset-only
       values now: Conditional (Yes only when lookup falls back to curated existing
       dataset values)'
     range: disease_enum
     multivalued: true
     comments:
-    - 'Values should be descendants of: NCIT:C7057, EFO:0000408'
+    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
     annotations:
       scope: sample
       propagate_study_value: true
   disease_details:
     description: 'More specific disease or condition term(s) for the participant;
-      use Healthy when appropriate. Lookup seed ontology IDs: NCIT:C7057; EFO:0000408.
+      use Healthy when appropriate. Lookup seed ontology IDs: NCIT:C7057; MONDO:0000001.
       Type: looked_up. Looked up: Yes. Includes child terms: Yes. Existing-dataset-only
       values now: Conditional (Yes only when lookup falls back to curated existing
       dataset values)'
     range: disease_details_enum
     multivalued: true
     comments:
-    - 'Values should be descendants of: NCIT:C7057, EFO:0000408'
+    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
     annotations:
       scope: sample
   disease_response_orr:
@@ -503,6 +508,7 @@ slots:
     pattern: '[0-9]+\.?[0-9]*'
     annotations:
       scope: sample
+      value_of: biomarker_name
   disease_response_os:
     description: Overall survival duration (time to death from any cause; NCIT:C125201).
     range: float
@@ -531,6 +537,7 @@ slots:
     pattern: ^\d+(\.\d+)?$
     annotations:
       scope: sample
+      value_of: feces_phenotype
   tumor_size_measurement:
     description: Tumor size measurement from clinical assessment or resected specimen
       (NCIT:C106303).
@@ -551,6 +558,7 @@ slots:
     pattern: .+
     annotations:
       scope: sample
+      separator: ':'
   study_name:
     description: Canonical study identifier (for example EinsteinA_YYYY).
     range: string
@@ -572,14 +580,14 @@ slots:
       scope: study
   target_condition:
     description: 'Primary phenotype(s) or condition(s) investigated in the study.
-      Lookup seed ontology IDs: NCIT:C7057; EFO:0000408. Type: looked_up. Looked up:
-      Yes. Includes child terms: Yes. Existing-dataset-only values now: Conditional
+      Lookup seed ontology IDs: NCIT:C7057; MONDO:0000001. Type: looked_up. Looked
+      up: Yes. Includes child terms: Yes. Existing-dataset-only values now: Conditional
       (Yes only when lookup falls back to curated existing dataset values)'
     range: target_condition_enum
     required: true
     multivalued: true
     comments:
-    - 'Values should be descendants of: NCIT:C7057, EFO:0000408'
+    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
     annotations:
       scope: study
   antibiotics_exclusion_period:
@@ -761,9 +769,9 @@ enums:
         - rdfs:subClassOf
         is_direct: false
     - reachable_from:
-        source_ontology: obo:efo
+        source_ontology: obo:mondo
         source_nodes:
-        - EFO:0000408
+        - MONDO:0000001
         relationship_types:
         - rdfs:subClassOf
         is_direct: false
@@ -777,9 +785,9 @@ enums:
         - rdfs:subClassOf
         is_direct: false
     - reachable_from:
-        source_ontology: obo:efo
+        source_ontology: obo:mondo
         source_nodes:
-        - EFO:0000408
+        - MONDO:0000001
         relationship_types:
         - rdfs:subClassOf
         is_direct: false
@@ -934,9 +942,9 @@ enums:
         - rdfs:subClassOf
         is_direct: false
     - reachable_from:
-        source_ontology: obo:efo
+        source_ontology: obo:mondo
         source_nodes:
-        - EFO:0000408
+        - MONDO:0000001
         relationship_types:
         - rdfs:subClassOf
         is_direct: false

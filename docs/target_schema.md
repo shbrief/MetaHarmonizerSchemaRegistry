@@ -55,13 +55,12 @@ source values are copied into the output without ontology mapping.
 - **Headers are dotted lower case** and come in this order:
 
   ```
-  col.name, col.class, unique, required, scope, unit.of, multiplevalues,
-  delimiter, separator, description, corpus.type, allowedvalues, static.enum,
-  dynamic.enum, dynamic.enum.property
+  col.name, col.class, unique, required, scope, unit.of, value.of,
+  propagate.study.value, multiplevalues, delimiter, separator, description,
+  corpus.type, allowedvalues, static.enum, dynamic.enum, dynamic.enum.property
   ```
 
-  `scope`, `unit.of` and `propagate.study.value` (between `unit.of` and
-  `multiplevalues`) are optional. `Rscript scripts/format_schema.R` puts the
+  `scope`, `unit.of`, `value.of` and `propagate.study.value` are optional. `Rscript scripts/format_schema.R` puts the
   columns in this order for you. Header names must match exactly:
   `dynamic_enum` or `Separater` are not recognized, and an unrecognized column
   is ignored.
@@ -102,10 +101,11 @@ export and curators rely on them.
 | `required` | No | `required` or `optional` |
 | `scope` | No | Optional, for example `sample` or `study` |
 | `unit.of` | No | Optional; the field whose unit this field records |
+| `value.of` | No | Optional; the field whose values this field records, item by item (see [§6](#6-multi-valued-fields)) |
 | `propagate.study.value` | No | Optional; `TRUE` when a study-level value applies to every sample, else `FALSE` |
 | `multiplevalues` | Yes | `TRUE` or `FALSE`, never `NA` (see [§6](#6-multi-valued-fields)) |
 | `delimiter` | No | The separator the curated data uses in a multi-valued cell (`;` or `<;>`), `NA` otherwise |
-| `separator` | No | A multi-character token for key:value pairs, else `NA` |
+| `separator` | No | The token between key and value inside each item of a key:value field (`:`), else `NA` |
 | `description` | No | Definition of the field, ideally the ontology definition |
 | `corpus.type` | Yes (see [§5](#5-closed-value-lists-allowedvalues-staticenum)) | **Required.** Decides how `allowedvalues` is read. See below. |
 | `allowedvalues` | Yes | Depends on `corpus.type` |
@@ -258,10 +258,32 @@ such a version.
     union of their terms.
   - For a single-valued field, MetaHarmonizer keeps only the best-scoring
     source column.
+- **Three kinds of multi-valued field.** Say which one a field is:
+
+  | Kind | Example | Columns |
+  |---|---|---|
+  | Independent values; order does not matter | `disease`: `Crohn disease;Ulcerative colitis` | `delimiter` |
+  | Parallel lists: item *i* belongs to item *i* of another field | `probing_pocket_depth` `Buccal surface<;>Distal surface of tooth` with `probing_pocket_depth_value` `3<;>4` | `value.of` (or `unit.of`) on the dependent field |
+  | key:value items | `uncurated_metadata`: `BASDAI:6.8<;>BASFI:0.9` | `separator` (`:`) |
+
+  - `value.of` and `unit.of` name the field the list belongs to:
+    `probing_pocket_depth_value` → `probing_pocket_depth`,
+    `feces_phenotype_value` → `feces_phenotype`, `biomarker_value` →
+    `biomarker_name`, `biomarker_unit` → `biomarker_value`. The linked fields
+    must have the same `multiplevalues` and `delimiter` (the lint checks), and
+    each sample must have the same number of items in each (validation).
+  - In the cMD data `<;>` is used for ordered lists and key:value items and
+    `;` for independent values, but `biomarker_*` are parallel lists joined
+    with `;`. The delimiter alone does not say which kind a field is;
+    `value.of`, `unit.of` and `separator` do.
 - **Output values and term IDs are always joined with `;`** by MetaHarmonizer.
 - **Input cells are not split.** `delimiter` is not used to split input cells;
   each distinct cell is matched as one string. Keep `delimiter` accurate anyway
   for validation and for downstream users.
+- **Parallel lists need care in harmonization.** Only the field a list belongs
+  to is mapped to ontology terms; its `value.of` / `unit.of` fields pass
+  through. Merging several source columns into one of these fields (a union of
+  terms) can break the pairing, so map each pair from a single source.
 
 ---
 

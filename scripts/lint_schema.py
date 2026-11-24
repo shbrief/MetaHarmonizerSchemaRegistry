@@ -31,6 +31,13 @@ The conventions (see docs/target_schema.md for the full guide):
   ``children``.
 * ``delimiter``: ``;`` or ``<;>`` for multi-valued fields, matching the
   curated data; ``NA`` otherwise.
+* ``separator``: the token between key and value inside each item of a
+  key:value field (``:`` for ``uncurated_metadata``); ``NA`` otherwise. It must
+  differ from the delimiter.
+* ``unit.of`` / ``value.of``: the field this field holds the unit / value of.
+  The two fields are parallel lists (item *i* of one belongs to item *i* of the
+  other), so the named field must exist and both must have the same
+  ``multiplevalues`` and ``delimiter``.
 
 Optional checks:
 
@@ -64,11 +71,11 @@ from pathlib import Path
 # Canonical column order. OPTIONAL columns may be absent; all others are required.
 CANONICAL = [
     "col.name", "col.class", "unique", "required", "scope", "unit.of",
-    "propagate.study.value", "multiplevalues", "delimiter", "separator",
+    "value.of", "propagate.study.value", "multiplevalues", "delimiter", "separator",
     "description", "corpus.type", "allowedvalues", "static.enum",
     "dynamic.enum", "dynamic.enum.property",
 ]
-OPTIONAL = {"scope", "unit.of", "propagate.study.value"}
+OPTIONAL = {"scope", "unit.of", "value.of", "propagate.study.value"}
 # Old spellings and their replacements.
 RENAMED = {"Separater": "separator", "uniqueness": "unique", "requiredness": "required",
            "dynamic_enum": "dynamic.enum", "dynamic_enum_property": "dynamic.enum.property"}
@@ -312,8 +319,38 @@ def check_row(rep: Report, r: dict, seen: set):
         if mv == "FALSE" and not is_na(delim):
             rep.warn(w, f"single-valued field has delimiter {delim!r}")
 
+    sep = g("separator")
+    if sep is not None and not is_na(sep):
+        if mv != "TRUE":
+            rep.warn(w, f"separator {sep!r} set on a single-valued field")
+        elif sep == delim or (not is_na(delim or "NA") and sep in (delim or "")):
+            rep.err(w, f"separator {sep!r} must differ from the delimiter {delim!r}")
+
     if is_na(g("description") or "NA"):
         rep.warn(w, "description is empty")
+
+
+def check_links(rep: Report, rows: list[dict]):
+    """unit.of / value.of name an existing field with the same list shape."""
+    by_name = {(r.get("col.name") or "").strip(): r for r in rows}
+    for r in rows:
+        name = (r.get("col.name") or "").strip()
+        for col in ("unit.of", "value.of"):
+            target = (r.get(col) or "").strip()
+            if is_na(target) or target.upper() in ("TRUE", "FALSE"):
+                continue
+            t = by_name.get(target)
+            if t is None:
+                rep.err(name, f"{col} names {target!r}, which is not a field")
+                continue
+            if target == name:
+                rep.err(name, f"{col} names the field itself")
+                continue
+            for c in ("multiplevalues", "delimiter"):
+                a, b = r.get(c), t.get(c)
+                if a is not None and b is not None and a != b:
+                    rep.err(name, f"{col} {target!r}: {c} is {a!r} here but {b!r} there; "
+                                  "parallel lists need the same")
 
 
 def check_metaharmonizer(rep: Report, path: str, rows: list[dict]):
@@ -386,6 +423,7 @@ def lint(path: str, online: bool) -> Report:
     seen: set = set()
     for r in rows:
         check_row(rep, r, seen)
+    check_links(rep, rows)
     if not check_metaharmonizer(rep, path, rows):
         rep.warn("metaharmonizer", "not importable; skipped the read_schema_table() check")
     if online:

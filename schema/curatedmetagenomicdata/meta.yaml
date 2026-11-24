@@ -6,7 +6,7 @@
 # roots narrowed; minor = a field, allowed value or root added, a missing term
 # ID filled in; patch = descriptions and typos that change no value.
 schema: cmd
-version: "0.1.0"
+version: "0.2.0"
 date: "2026-11-24"
 description: "curatedMetagenomicData harmonized metadata"
 tables:
@@ -23,6 +23,7 @@ ontologies:       # OLS4 version of each ontology the table cites, when `version
   EFO: "3.96.0"
   FMA: "5.1.0"
   HANCESTRO: "2025-10-14"
+  MONDO: "2026-11-03"
   MRO: "2026-11-18"
   NCIT: "26.02d"
   SNOMED: "2026-10-21"

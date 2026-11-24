@@ -15,7 +15,7 @@
 # in a spreadsheet program, so that diffs stay small. Base R only.
 
 CANONICAL <- c("col.name", "col.class", "unique", "required", "scope", "unit.of",
-               "propagate.study.value", "multiplevalues", "delimiter", "separator",
+               "value.of", "propagate.study.value", "multiplevalues", "delimiter", "separator",
                "description", "corpus.type", "allowedvalues", "static.enum",
                "dynamic.enum", "dynamic.enum.property")
 

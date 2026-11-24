@@ -216,7 +216,9 @@ def table_to_linkml_schema(
 
         # Curation-behaviour annotations carried through from the schema table.
         # `scope` says whether a value describes the study or an individual sample;
-        # `unit.of` marks a slot that carries another slot's unit. Downstream
+        # `unit.of` marks a slot that carries another slot's unit, `value.of` one
+        # that carries another slot's values (parallel lists, paired by
+        # position), and `separator` the key:value token inside each item. Downstream
         # consumers (MetaExtractor's make_clean_schema.py) read these instead of
         # keeping their own hardcoded copies.
         annotations: dict = {}
@@ -235,6 +237,12 @@ def table_to_linkml_schema(
                     annotations["is_unit"] = True
             else:
                 annotations["unit_of"] = token
+        value_of = row.get("value.of")
+        if not _isna(value_of) and str(value_of).strip():
+            annotations["value_of"] = str(value_of).strip()
+        separator = row.get("separator")
+        if not _isna(separator) and str(separator).strip():
+            annotations["separator"] = str(separator).strip()
         if annotations:
             slot_def["annotations"] = annotations
 
