@@ -1,53 +1,53 @@
-"col.name","col.class","unique","required","multiplevalues","description","allowedvalues","static.enum","dynamic.enum","dynamic.enum.property","delimiter","separator","corpus.type"
-"AGE","integer","non-unique","optional","FALSE","Age at which the condition or disease was first diagnosed, in years.","[0-9]+",NA,NA,NA,NA,NA,"integer"
-"DFS_MONTHS","double","non-unique","optional","FALSE","Disease free survival in months since initial treatment.",NA,NA,NA,NA,NA,NA,"numeric"
-"DFS_STATUS","character","non-unique","optional","FALSE","Disease free status since initial treatment. Value must be prefixed with 0: (no event) or 1: (event occurred).","0:DiseaseFree|1:Recurred/Progressed",NA,NA,NA,NA,NA,"static_enum"
-"GENDER","character","non-unique","optional","FALSE","Gender or sex of the patient.",".+",NA,NA,NA,NA,NA,"any"
-"OS_MONTHS","double","non-unique","optional","FALSE","Overall survival in months since initial diagnosis.",NA,NA,NA,NA,NA,NA,"numeric"
-"OS_STATUS","character","non-unique","optional","FALSE","Overall patient survival status. Value must be prefixed with 0: (no event) or 1: (event occurred).","1:DECEASED|0:LIVING",NA,NA,NA,NA,NA,"static_enum"
-"PATIENT_DISPLAY_NAME","character","non-unique","optional","FALSE","Patient display name shown in the patient view header.",NA,NA,NA,NA,NA,NA,"any"
-"PATIENT_ID","character","non-unique","required","FALSE","Unique patient identifier. Allowed characters: numbers, letters, points, underscores, and hyphens.","[0-9a-zA-Z._-]+",NA,NA,NA,NA,NA,"regexp"
-"SEX","character","non-unique","optional","FALSE","Sex of the patient.",".+",NA,NA,NA,NA,NA,"any"
-"TUMOR_SITE","character","non-unique","optional","FALSE","Tumor site of the patient.",".+",NA,NA,NA,NA,NA,"any"
-"ASCN.CCF_EXPECTED_COPIES","double","non-unique","optional","FALSE","Cancer-cell fraction if mutation exists on major allele. Required if ascn namespace is specified.",NA,NA,NA,NA,NA,NA,"numeric"
-"ASCN.CCF_EXPECTED_COPIES_UPPER","double","non-unique","optional","FALSE","Upper error for CCF estimate. Required if ascn namespace is specified.",NA,NA,NA,NA,NA,NA,"numeric"
-"ASCN.EXPECTED_ALT_COPIES","double","non-unique","optional","FALSE","Estimated number of copies harboring mutant allele. Required if ascn namespace is specified.",NA,NA,NA,NA,NA,NA,"numeric"
-"CANCER_TYPE","character","non-unique","optional","FALSE","Cancer type. Overrides study-wide cancer type.",".+",NA,NA,NA,NA,NA,"any"
-"CANCER_TYPE_DETAILED","character","non-unique","optional","FALSE","Cancer type detailed, a sub-type of the specified CANCER_TYPE.",".+",NA,NA,NA,NA,NA,"any"
-"DRIVER_MUTATIONS","character","non-unique","optional","FALSE","Driver mutation annotations.",".+",NA,NA,NA,NA,NA,"any"
-"ERG_FUSION_ACGH","character","non-unique","optional","FALSE","ERG fusion status determined by aCGH.",".+",NA,NA,NA,NA,NA,"any"
-"ETS_RAF_SPINK1_STATUS","character","non-unique","optional","FALSE","ETS/RAF/SPINK1 molecular status.",".+",NA,NA,NA,NA,NA,"any"
-"GLEASON_SCORE","character","non-unique","optional","FALSE","Radical prostatectomy Gleason score for prostate cancer.",".+",NA,NA,NA,NA,NA,"any"
-"HISTOLOGY","character","non-unique","optional","FALSE","Histological classification.",".+",NA,NA,NA,NA,NA,"any"
-"KNOWN_MOLECULAR_CLASSIFIER","character","non-unique","optional","FALSE","Molecular classification of the sample.",".+",NA,NA,NA,NA,NA,"any"
-"SERUM_PSA","double","non-unique","optional","FALSE","Serum PSA level.",NA,NA,NA,NA,NA,NA,"numeric"
-"TMPRSS2_ERG_FUSION_STATUS","character","non-unique","optional","FALSE","TMPRSS2-ERG fusion status.",".+",NA,NA,NA,NA,NA,"any"
-"TUMOR_GRADE","character","non-unique","optional","FALSE","Tumor grade.",".+",NA,NA,NA,NA,NA,"any"
-"TUMOR_STAGE_2009","character","non-unique","optional","FALSE","Tumor stage (2009 staging system).",".+",NA,NA,NA,NA,NA,"any"
-"METASTATIC_SITE","character","non-unique","optional","FALSE","Overrides patient-level TUMOR_SITE for metastatic samples.",".+",NA,NA,NA,NA,NA,"any"
-"PRIMARY_SITE","character","non-unique","optional","FALSE","Overrides patient-level TUMOR_SITE for primary samples.",".+",NA,NA,NA,NA,NA,"any"
-"SAMPLE_CLASS","character","non-unique","optional","FALSE","Sample class label.",NA,NA,NA,NA,NA,NA,"any"
-"SAMPLE_DISPLAY_NAME","character","non-unique","optional","FALSE","Sample display name shown in addition to the sample ID.",NA,NA,NA,NA,NA,NA,"any"
-"SAMPLE_ID","character","unique","required","FALSE","Unique sample identifier. Allowed characters: numbers, letters, points, underscores, and hyphens.","[0-9a-zA-Z._-]+",NA,NA,NA,NA,NA,"regexp"
-"SAMPLE_TYPE","character","non-unique","optional","FALSE","Sample type. Affects timeline icon color: recurrence/recurred/progression/progressed=orange; metastatic/metastasis=red; primary/other=black.","recurrence|recurred|progression|progressed|metastatic|metastasis|primary",NA,NA,NA,NA,NA,"custom_enum"
-"TUMOR_TISSUE_SITE","character","non-unique","optional","FALSE","Tumor tissue site. Same timeline color behavior as SAMPLE_TYPE.","recurrence|recurred|progression|progressed|metastatic|metastasis|primary",NA,NA,NA,NA,NA,"custom_enum"
-"TUMOR_TYPE","character","non-unique","optional","FALSE","Tumor type. Same timeline color behavior as SAMPLE_TYPE.","recurrence|recurred|progression|progressed|metastatic|metastasis|primary",NA,NA,NA,NA,NA,"custom_enum"
-"AGENT","character","non-unique","optional","FALSE","Agent used in treatment with number of cycles if applicable.",".+",NA,NA,NA,NA,NA,"any"
-"AGENT_CLASS","character","non-unique","optional","FALSE","Classification group for agents.",".+",NA,NA,NA,NA,NA,"any"
-"DIAGNOSTIC_TYPE","character","non-unique","optional","FALSE","Diagnostic tool used (timeline IMAGING event), e.g. MRI, CT scan.",".+",NA,NA,NA,NA,NA,"any"
-"DIAGNOSTIC_TYPE_DETAILED","character","non-unique","optional","FALSE","Detailed description of the diagnostic event type.",".+",NA,NA,NA,NA,NA,"any"
-"EVENT_TYPE","character","non-unique","required","FALSE","Category of the timeline event.","TREATMENT|LAB_TEST|IMAGING|STATUS|SPECIMEN|SAMPLE ACQUISITION|SEQUENCING",NA,NA,NA,NA,NA,"custom_enum"
-"SPECIMEN_SITE","character","non-unique","optional","FALSE","Site from where the specimen was collected (timeline SPECIMEN event).",".+",NA,NA,NA,NA,NA,"any"
-"SPECIMEN_TYPE","character","non-unique","optional","FALSE","Specimen type.","tissue|blood",NA,NA,NA,NA,NA,"custom_enum"
-"START_DATE","integer","non-unique","required","FALSE","Start point of event calculated in days from the date of diagnosis (day 0).","[0-9]+",NA,NA,NA,NA,NA,"integer"
-"STATUS","character","non-unique","optional","FALSE","Status value for timeline STATUS events (e.g. best response, stage progression).",".+",NA,NA,NA,NA,NA,"any"
-"STOP_DATE","integer","non-unique","optional","FALSE","End date of event in days from diagnosis. Blank for point-in-time events.","[0-9]+",NA,NA,NA,NA,NA,"integer"
-"STYLE_COLOR","character","non-unique","optional","FALSE","Hexadecimal color value for rendering this event (e.g. #ffffff).","#[0-9a-fA-F]{6}",NA,NA,NA,NA,NA,"regexp"
-"STYLE_SHAPE","character","non-unique","optional","FALSE","Shape for rendering this event in timeline.","circle|square|triangle|diamond|star|camera",NA,NA,NA,NA,NA,"static_enum"
-"SUBTYPE","character","non-unique","optional","FALSE","Treatment subtype. Medical: Chemotherapy, Hormone Therapy, Targeted Therapy, etc. Radiation: WPRT, IVRT, etc.",".+",NA,NA,NA,NA,NA,"any"
-"TEST","character","non-unique","optional","FALSE","Type of test performed (timeline LAB_TEST event).",".+",NA,NA,NA,NA,NA,"any"
-"TL_PATIENT_ID","character","non-unique","required","FALSE","Patient ID from the dataset (timeline context).",".+",NA,NA,NA,NA,NA,"any"
-"TL_RESULT","character","non-unique","optional","FALSE","Result value for lab test or imaging.",".+",NA,NA,NA,NA,NA,"any"
-"TL_SAMPLE_ID","character","non-unique","optional","FALSE","Links timeline event to a sample.",".+",NA,NA,NA,NA,NA,"any"
-"TL_SOURCE","character","non-unique","optional","FALSE","Source/location where event was performed.",".+",NA,NA,NA,NA,NA,"any"
-"TREATMENT_TYPE","character","non-unique","optional","FALSE","Treatment type (timeline TREATMENT event).","Medical Therapy|Radiation Therapy",NA,NA,NA,NA,NA,"static_enum"
+"col.name","col.class","unique","required","multiplevalues","delimiter","separator","description","corpus.type","allowedvalues","static.enum","dynamic.enum","dynamic.enum.property"
+"AGE","integer","non-unique","optional",FALSE,NA,NA,"Age at which the condition or disease was first diagnosed, in years.","integer","[0-9]+",NA,NA,NA
+"DFS_MONTHS","double","non-unique","optional",FALSE,NA,NA,"Disease free survival in months since initial treatment.","numeric",NA,NA,NA,NA
+"DFS_STATUS","character","non-unique","optional",FALSE,NA,NA,"Disease free status since initial treatment. Value must be prefixed with 0: (no event) or 1: (event occurred).","static_enum","0:DiseaseFree|1:Recurred/Progressed",NA,NA,NA
+"GENDER","character","non-unique","optional",FALSE,NA,NA,"Gender or sex of the patient.","any",".+",NA,NA,NA
+"OS_MONTHS","double","non-unique","optional",FALSE,NA,NA,"Overall survival in months since initial diagnosis.","numeric",NA,NA,NA,NA
+"OS_STATUS","character","non-unique","optional",FALSE,NA,NA,"Overall patient survival status. Value must be prefixed with 0: (no event) or 1: (event occurred).","static_enum","1:DECEASED|0:LIVING",NA,NA,NA
+"PATIENT_DISPLAY_NAME","character","non-unique","optional",FALSE,NA,NA,"Patient display name shown in the patient view header.","any",NA,NA,NA,NA
+"PATIENT_ID","character","non-unique","required",FALSE,NA,NA,"Unique patient identifier. Allowed characters: numbers, letters, points, underscores, and hyphens.","regexp","[0-9a-zA-Z._-]+",NA,NA,NA
+"SEX","character","non-unique","optional",FALSE,NA,NA,"Sex of the patient.","any",".+",NA,NA,NA
+"TUMOR_SITE","character","non-unique","optional",FALSE,NA,NA,"Tumor site of the patient.","any",".+",NA,NA,NA
+"ASCN.CCF_EXPECTED_COPIES","double","non-unique","optional",FALSE,NA,NA,"Cancer-cell fraction if mutation exists on major allele. Required if ascn namespace is specified.","numeric",NA,NA,NA,NA
+"ASCN.CCF_EXPECTED_COPIES_UPPER","double","non-unique","optional",FALSE,NA,NA,"Upper error for CCF estimate. Required if ascn namespace is specified.","numeric",NA,NA,NA,NA
+"ASCN.EXPECTED_ALT_COPIES","double","non-unique","optional",FALSE,NA,NA,"Estimated number of copies harboring mutant allele. Required if ascn namespace is specified.","numeric",NA,NA,NA,NA
+"CANCER_TYPE","character","non-unique","optional",FALSE,NA,NA,"Cancer type. Overrides study-wide cancer type.","any",".+",NA,NA,NA
+"CANCER_TYPE_DETAILED","character","non-unique","optional",FALSE,NA,NA,"Cancer type detailed, a sub-type of the specified CANCER_TYPE.","any",".+",NA,NA,NA
+"DRIVER_MUTATIONS","character","non-unique","optional",FALSE,NA,NA,"Driver mutation annotations.","any",".+",NA,NA,NA
+"ERG_FUSION_ACGH","character","non-unique","optional",FALSE,NA,NA,"ERG fusion status determined by aCGH.","any",".+",NA,NA,NA
+"ETS_RAF_SPINK1_STATUS","character","non-unique","optional",FALSE,NA,NA,"ETS/RAF/SPINK1 molecular status.","any",".+",NA,NA,NA
+"GLEASON_SCORE","character","non-unique","optional",FALSE,NA,NA,"Radical prostatectomy Gleason score for prostate cancer.","any",".+",NA,NA,NA
+"HISTOLOGY","character","non-unique","optional",FALSE,NA,NA,"Histological classification.","any",".+",NA,NA,NA
+"KNOWN_MOLECULAR_CLASSIFIER","character","non-unique","optional",FALSE,NA,NA,"Molecular classification of the sample.","any",".+",NA,NA,NA
+"SERUM_PSA","double","non-unique","optional",FALSE,NA,NA,"Serum PSA level.","numeric",NA,NA,NA,NA
+"TMPRSS2_ERG_FUSION_STATUS","character","non-unique","optional",FALSE,NA,NA,"TMPRSS2-ERG fusion status.","any",".+",NA,NA,NA
+"TUMOR_GRADE","character","non-unique","optional",FALSE,NA,NA,"Tumor grade.","any",".+",NA,NA,NA
+"TUMOR_STAGE_2009","character","non-unique","optional",FALSE,NA,NA,"Tumor stage (2009 staging system).","any",".+",NA,NA,NA
+"METASTATIC_SITE","character","non-unique","optional",FALSE,NA,NA,"Overrides patient-level TUMOR_SITE for metastatic samples.","any",".+",NA,NA,NA
+"PRIMARY_SITE","character","non-unique","optional",FALSE,NA,NA,"Overrides patient-level TUMOR_SITE for primary samples.","any",".+",NA,NA,NA
+"SAMPLE_CLASS","character","non-unique","optional",FALSE,NA,NA,"Sample class label.","any",NA,NA,NA,NA
+"SAMPLE_DISPLAY_NAME","character","non-unique","optional",FALSE,NA,NA,"Sample display name shown in addition to the sample ID.","any",NA,NA,NA,NA
+"SAMPLE_ID","character","unique","required",FALSE,NA,NA,"Unique sample identifier. Allowed characters: numbers, letters, points, underscores, and hyphens.","regexp","[0-9a-zA-Z._-]+",NA,NA,NA
+"SAMPLE_TYPE","character","non-unique","optional",FALSE,NA,NA,"Sample type. Affects timeline icon color: recurrence/recurred/progression/progressed=orange; metastatic/metastasis=red; primary/other=black.","custom_enum","recurrence|recurred|progression|progressed|metastatic|metastasis|primary",NA,NA,NA
+"TUMOR_TISSUE_SITE","character","non-unique","optional",FALSE,NA,NA,"Tumor tissue site. Same timeline color behavior as SAMPLE_TYPE.","custom_enum","recurrence|recurred|progression|progressed|metastatic|metastasis|primary",NA,NA,NA
+"TUMOR_TYPE","character","non-unique","optional",FALSE,NA,NA,"Tumor type. Same timeline color behavior as SAMPLE_TYPE.","custom_enum","recurrence|recurred|progression|progressed|metastatic|metastasis|primary",NA,NA,NA
+"AGENT","character","non-unique","optional",FALSE,NA,NA,"Agent used in treatment with number of cycles if applicable.","any",".+",NA,NA,NA
+"AGENT_CLASS","character","non-unique","optional",FALSE,NA,NA,"Classification group for agents.","any",".+",NA,NA,NA
+"DIAGNOSTIC_TYPE","character","non-unique","optional",FALSE,NA,NA,"Diagnostic tool used (timeline IMAGING event), e.g. MRI, CT scan.","any",".+",NA,NA,NA
+"DIAGNOSTIC_TYPE_DETAILED","character","non-unique","optional",FALSE,NA,NA,"Detailed description of the diagnostic event type.","any",".+",NA,NA,NA
+"EVENT_TYPE","character","non-unique","required",FALSE,NA,NA,"Category of the timeline event.","custom_enum","TREATMENT|LAB_TEST|IMAGING|STATUS|SPECIMEN|SAMPLE ACQUISITION|SEQUENCING",NA,NA,NA
+"SPECIMEN_SITE","character","non-unique","optional",FALSE,NA,NA,"Site from where the specimen was collected (timeline SPECIMEN event).","any",".+",NA,NA,NA
+"SPECIMEN_TYPE","character","non-unique","optional",FALSE,NA,NA,"Specimen type.","custom_enum","tissue|blood",NA,NA,NA
+"START_DATE","integer","non-unique","required",FALSE,NA,NA,"Start point of event calculated in days from the date of diagnosis (day 0).","integer","[0-9]+",NA,NA,NA
+"STATUS","character","non-unique","optional",FALSE,NA,NA,"Status value for timeline STATUS events (e.g. best response, stage progression).","any",".+",NA,NA,NA
+"STOP_DATE","integer","non-unique","optional",FALSE,NA,NA,"End date of event in days from diagnosis. Blank for point-in-time events.","integer","[0-9]+",NA,NA,NA
+"STYLE_COLOR","character","non-unique","optional",FALSE,NA,NA,"Hexadecimal color value for rendering this event (e.g. #ffffff).","regexp","#[0-9a-fA-F]{6}",NA,NA,NA
+"STYLE_SHAPE","character","non-unique","optional",FALSE,NA,NA,"Shape for rendering this event in timeline.","static_enum","circle|square|triangle|diamond|star|camera",NA,NA,NA
+"SUBTYPE","character","non-unique","optional",FALSE,NA,NA,"Treatment subtype. Medical: Chemotherapy, Hormone Therapy, Targeted Therapy, etc. Radiation: WPRT, IVRT, etc.","any",".+",NA,NA,NA
+"TEST","character","non-unique","optional",FALSE,NA,NA,"Type of test performed (timeline LAB_TEST event).","any",".+",NA,NA,NA
+"TL_PATIENT_ID","character","non-unique","required",FALSE,NA,NA,"Patient ID from the dataset (timeline context).","any",".+",NA,NA,NA
+"TL_RESULT","character","non-unique","optional",FALSE,NA,NA,"Result value for lab test or imaging.","any",".+",NA,NA,NA
+"TL_SAMPLE_ID","character","non-unique","optional",FALSE,NA,NA,"Links timeline event to a sample.","any",".+",NA,NA,NA
+"TL_SOURCE","character","non-unique","optional",FALSE,NA,NA,"Source/location where event was performed.","any",".+",NA,NA,NA
+"TREATMENT_TYPE","character","non-unique","optional",FALSE,NA,NA,"Treatment type (timeline TREATMENT event).","static_enum","Medical Therapy|Radiation Therapy",NA,NA,NA
