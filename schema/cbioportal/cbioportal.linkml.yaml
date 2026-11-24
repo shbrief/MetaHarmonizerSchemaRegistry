@@ -1,6 +1,6 @@
 id: https://w3id.org/omicsmlrepo/cbioportal
 name: cbioportal
-version: 0.1.0
+version: 0.1.1
 last_updated_on: '2026-11-24'
 description: cbioportal schema for the MetaHarmonizer ecosystem
 prefixes:

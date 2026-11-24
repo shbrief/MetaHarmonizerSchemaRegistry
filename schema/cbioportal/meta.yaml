@@ -6,7 +6,7 @@
 # roots narrowed; minor = a field, allowed value or root added, a missing term
 # ID filled in; patch = descriptions and typos that change no value.
 schema: cbioportal
-version: "0.1.0"
+version: "0.1.1"
 date: "2026-11-24"
 description: "cBioPortal clinical attributes"
 # cbioportal_schema_internal.csv is a working list: kept here, but not
