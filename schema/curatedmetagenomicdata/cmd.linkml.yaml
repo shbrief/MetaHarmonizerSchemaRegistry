@@ -1,7 +1,7 @@
 id: https://w3id.org/omicsmlrepo/cmd
 name: cmd
 version: 1.0.0
-last_updated_on: '2026-07-01'
+last_updated_on: '2026-09-19'
 description: cmd schema for the MetaHarmonizer ecosystem
 prefixes:
   linkml: https://w3id.org/linkml/
@@ -18,28 +18,20 @@ classes:
   CmdRecord:
     description: Main data class for cmd
     slots:
-    - study_name
+    - location
     - subject_id
     - sample_id
-    - curator
-    - pmid
     - subcohort
-    - target_condition
     - control
     - country
     - body_site
     - body_site_details
     - days_from_first_collection
     - lifestyle
-    - location
     - probing_pocket_depth
     - westernized
-    - antibiotics_exclusion_period
-    - antibiotics_exclusion_period_unit
     - probing_pocket_depth_value
-    - dna_extraction_kit
     - ncbi_accession
-    - sequencing_platform
     - age
     - age_group
     - age_unit
@@ -88,52 +80,52 @@ classes:
     - tumor_size_measurement
     - tumor_size_residual_measurement
     - uncurated_metadata
+    - study_name
+    - curator
+    - pmid
+    - target_condition
+    - antibiotics_exclusion_period
+    - antibiotics_exclusion_period_unit
+    - dna_extraction_kit
+    - sequencing_platform
     - host_species
 slots:
-  study_name:
-    description: Canonical study identifier (for example EinsteinA_YYYY).
+  location:
+    description: Free-text additional location detail (for example city or region).
     range: string
-    required: true
-    pattern: '[a-zA-Z-]+_[0-9]{4}|[a-zA-Z-]+_[0-9]{4}[a-zA-Z-]+|[a-zA-Z-]+_[0-9]{4}_[a-zA-Z-]+|[a-zA-Z-]+_[0-9]{4}_[a-zA-Z0-9]+'
+    pattern: .+
+    annotations:
+      scope: sample
+      propagate_study_value: true
   subject_id:
     description: Unique identifier for a participant within a study. Values may be
       non-unique e.g. when there are repeated measures for a participant.
     range: string
     required: true
     pattern: '[0-9a-zA-Z]\S+'
+    annotations:
+      scope: sample
   sample_id:
     description: Unique identifier for a biospecimen/sample.
     range: string
     required: true
     identifier: true
     pattern: '[0-9a-zA-Z]\S+'
-  curator:
-    description: Name(s) of curator(s) responsible for this entry.
-    range: string
-    multivalued: true
-  pmid:
-    description: PubMed identifier of the primary publication for the study.
-    range: integer
-    pattern: '[0-9]{8}'
+    annotations:
+      scope: sample
   subcohort:
     description: Identifier for a subset of the study cohort.
     range: string
     pattern: '[0-9a-zA-Z]\S+'
-  target_condition:
-    description: 'Primary phenotype(s) or condition(s) investigated in the study.
-      Lookup seed ontology IDs: NCIT:C7057; MONDO:0000001. Type: looked_up. Looked
-      up: Yes. Includes child terms: Yes. Existing-dataset-only values now: Conditional
-      (Yes only when lookup falls back to curated existing dataset values)'
-    range: target_condition_enum
-    required: true
-    multivalued: true
-    comments:
-    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
+    annotations:
+      scope: sample
   control:
     description: 'Case-control role of the sample in the study. Static ontology IDs:
       NCIT:C142703; NCIT:C49152; NCIT:C69062. Type: static.'
     range: control_enum
     required: true
+    annotations:
+      scope: sample
   country:
     description: 'Country where the participant resides and/or the sample was collected.
       Lookup seed ontology IDs: NCIT:C25464. Type: looked_up. Looked up: Yes. Includes
@@ -142,12 +134,18 @@ slots:
     range: country_enum
     comments:
     - 'Values should be descendants of: NCIT:C25464'
+    annotations:
+      scope: sample
+      propagate_study_value: true
   body_site:
     description: 'Anatomical body site from which the sample was collected. Static
       ontology IDs: UBERON:0001988; UBERON:0000167; UBERON:0001003; UBERON:0000996;
       UBERON:0001707; UBERON:0001913. Type: static.'
     range: body_site_enum
     required: true
+    annotations:
+      scope: sample
+      propagate_study_value: true
   body_site_details:
     description: 'More specific anatomical subsite for sample collection than body_site.
       Lookup seed ontology IDs: UBERON:0001062. Type: looked_up. Looked up: Yes. Includes
@@ -157,55 +155,54 @@ slots:
     multivalued: true
     comments:
     - 'Values should be descendants of: UBERON:0001062'
+    annotations:
+      scope: sample
   days_from_first_collection:
     description: Days elapsed since the first collection time point in longitudinal
       studies.
     range: integer
     pattern: '[0-9]+'
+    annotations:
+      scope: sample
   lifestyle:
     description: Lifestyle category (primarily used for traditional or non-westernized
       populations).
     range: lifestyle_enum
-  location:
-    description: Free-text additional location detail (for example city or region).
-    range: string
-    pattern: .+
+    annotations:
+      scope: sample
+      propagate_study_value: true
   probing_pocket_depth:
     description: 'Tooth surface/region where periodontal pocket depth was measured.
       Static ontology IDs: FMA:64849; FMA:55649; FMA:55647; FMA:55650. Type: static.'
     range: probing_pocket_depth_enum
     multivalued: true
+    annotations:
+      scope: sample
   westernized:
     description: Whether the participant is classified as westernized.
     range: westernized_enum
-  antibiotics_exclusion_period:
-    description: Minimum washout period from antibiotic use required by study criteria.
-    range: float
-    pattern: '[0-9]+\.?[0-9]*'
-  antibiotics_exclusion_period_unit:
-    description: 'Unit used for `antibiotics_exclusion_period`. Static ontology IDs:
-      NCIT:C25301; NCIT:C29844; NCIT:C29846. Type: static.'
-    range: antibiotics_exclusion_period_unit_enum
+    annotations:
+      scope: sample
+      propagate_study_value: true
   probing_pocket_depth_value:
     description: Numeric probing depth measurement corresponding to `probing_pocket_depth`.
     range: string
     multivalued: true
     pattern: ^\d+(\.\d+)?$
-  dna_extraction_kit:
-    description: Name of the DNA extraction kit or protocol used.
-    range: dna_extraction_kit_enum
+    annotations:
+      scope: sample
   ncbi_accession:
     description: NCBI SRA/ENA accession(s) associated with the sample or run.
     range: string
     pattern: '[ES]R[SR][0-9]+'
-  sequencing_platform:
-    description: Sequencing platform/instrument used to generate the data.
-    range: sequencing_platform_enum
-    required: true
+    annotations:
+      scope: sample
   age:
     description: Participant age in the unit specified by `age_unit`.
     range: integer
     pattern: '[0-9]+'
+    annotations:
+      scope: sample
   age_group:
     description: 'Age group classification: Newborn (< 1 month/28 days), Infant (>=
       1 month & < 2 yrs), Child (>= 2 yrs & < 11 yrs), Adolescent (>= 11 yrs & < 18
@@ -213,10 +210,15 @@ slots:
       NCIT:C16731; NCIT:C27956; NCIT:C16423; NCIT:C27954; NCIT:C17600; NCIT:C16268.
       Type: static.'
     range: age_group_enum
+    annotations:
+      scope: sample
   age_unit:
     description: 'Unit used to report `age`. Static ontology IDs: NCIT:C25301; NCIT:C29844;
       NCIT:C29846; NCIT:C29848. Type: static.'
     range: age_unit_enum
+    annotations:
+      scope: sample
+      unit_of: age
   ancestry:
     description: 'Broad ancestry category (children of HANCESTRO:0004). Lookup seed
       ontology IDs: HANCESTRO:0004. Type: looked_up. Looked up: Yes. Includes child
@@ -225,6 +227,9 @@ slots:
     range: ancestry_enum
     comments:
     - 'Values should be direct children of: HANCESTRO:0004'
+    annotations:
+      scope: sample
+      propagate_study_value: true
   ancestry_details:
     description: 'More specific ancestry term(s) typically refer to descendants of
       the selected ancestry category. Lookup seed ontology IDs: HANCESTRO:0004. Type:
@@ -235,72 +240,102 @@ slots:
     multivalued: true
     comments:
     - 'Values should be descendants of: HANCESTRO:0004'
+    annotations:
+      scope: sample
   family:
     description: Family identifier when multiple related participants are included.
     range: string
     pattern: .+
+    annotations:
+      scope: sample
   family_role:
     description: Participant role within the family (for family-based sampling).
     range: family_role_enum
+    annotations:
+      scope: sample
   sex:
     description: 'Biological sex of the subject Static ontology IDs: NCIT:C16576;
       NCIT:C20197. Type: static.'
     range: sex_enum
+    annotations:
+      scope: sample
   zigosity:
     description: Twin zygosity status.
     range: zigosity_enum
+    annotations:
+      scope: sample
   age_min:
     description: Minimum possible age. For samples only with 'age_group' information,
       this represents the definition of a given age group. For specific age information,
       'age_min' and 'age_max' are identical.
     range: float
     pattern: '[0-9]+\.?[0-9]*'
+    annotations:
+      scope: sample
   age_max:
     description: Maximum possible age. For samples only with 'age_group' information,
       this represents the definition of a given age group. For specific age information,
       'age_min' and 'age_max' are identical.
     range: float
     pattern: '[0-9]+\.?[0-9]*'
+    annotations:
+      scope: sample
   age_years:
     description: Age in years
     range: float
     pattern: '[0-9]+\.?[0-9]*'
+    annotations:
+      scope: sample
   antibiotics_current_use:
     description: Whether the participant is currently using antibiotics.
     range: antibiotics_current_use_enum
+    annotations:
+      scope: sample
+      propagate_study_value: true
   bmi:
     description: Body mass index (BMI; EFO:0004340) calculated as weight (kg) divided
       by height squared (m²).
     range: float
     pattern: '[0-9]+\.?[0-9]*'
+    annotations:
+      scope: sample
   dietary_restriction:
     description: Dietary regime (partial match to SNOMED:182922004 or SNOMED:162536008)
     range: dietary_restriction_enum
     multivalued: true
+    annotations:
+      scope: sample
   disease:
     description: 'Reported disease or condition term(s) for the participant; use Healthy
       when no target condition is detected. Lookup seed ontology IDs: NCIT:C7057;
-      MONDO:0000001. Type: looked_up. Looked up: Yes. Includes child terms: Yes. Existing-dataset-only
+      EFO:0000408. Type: looked_up. Looked up: Yes. Includes child terms: Yes. Existing-dataset-only
       values now: Conditional (Yes only when lookup falls back to curated existing
       dataset values)'
     range: disease_enum
     multivalued: true
     comments:
-    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
+    - 'Values should be descendants of: NCIT:C7057, EFO:0000408'
+    annotations:
+      scope: sample
+      propagate_study_value: true
   disease_details:
     description: 'More specific disease or condition term(s) for the participant;
-      use Healthy when appropriate. Lookup seed ontology IDs: NCIT:C7057; MONDO:0000001.
+      use Healthy when appropriate. Lookup seed ontology IDs: NCIT:C7057; EFO:0000408.
       Type: looked_up. Looked up: Yes. Includes child terms: Yes. Existing-dataset-only
       values now: Conditional (Yes only when lookup falls back to curated existing
       dataset values)'
     range: disease_details_enum
     multivalued: true
     comments:
-    - 'Values should be descendants of: NCIT:C7057, MONDO:0000001'
+    - 'Values should be descendants of: NCIT:C7057, EFO:0000408'
+    annotations:
+      scope: sample
   disease_response_orr:
     description: Overall response rate (ORR; NCIT:C96613) indicator for treatment
       response.
     range: disease_response_orr_enum
+    annotations:
+      scope: sample
   disease_response_pfs:
     description: 'Progression Free Survival (PFS, EFO:0004920): Progression free survival
       is a measurement from a defined time point e.g. diagnosis and indicates that
@@ -308,10 +343,14 @@ slots:
       did not occur. PFS is usually used in analyzing results of treatment for advanced
       disease.'
     range: disease_response_pfs_enum
+    annotations:
+      scope: sample
   disease_response_pfs_month:
     description: Progression-free survival follow-up time in months.
     range: integer
     pattern: '[0-9]+'
+    annotations:
+      scope: sample
   disease_response_recist:
     description: 'Response Evaluation Criteria in Solid Tumors (RECIST, DICOM:112022):
       Standard parameters to be used when documenting response of solid tumors to
@@ -320,20 +359,28 @@ slots:
       (from www.recist.com) Static ontology IDs: NCIT:C159715; NCIT:C159547; NCIT:C159716;
       NCIT:C159546. Type: static.'
     range: disease_response_recist_enum
+    annotations:
+      scope: sample
   feces_phenotype:
     description: 'Stool-related phenotype or clinical measurement type. Static ontology
       IDs: SNOMED:443172007; NCIT:C82005; NCIT:C191036. Type: static.'
     range: feces_phenotype_enum
     multivalued: true
+    annotations:
+      scope: sample
   fmt_id:
     description: Study-specific identifier assigned to FMT participants.
     range: string
     multivalued: true
     pattern: .+
+    annotations:
+      scope: sample
   fmt_role:
     description: Role in fecal microbiota transplantation (donor or recipient before/after
       procedure).
     range: fmt_role_enum
+    annotations:
+      scope: sample
   hla:
     description: 'Human leukocyte antigen (HLA) typing information. Lookup seed ontology
       IDs: MRO:0001676. Type: looked_up. Looked up: Yes. Includes child terms: Yes.
@@ -343,32 +390,48 @@ slots:
     multivalued: true
     comments:
     - 'Values should be descendants of: MRO:0001676'
+    annotations:
+      scope: sample
   neonatal_birth_weight:
     description: Birth weight (EFO:0004344) recorded in grams.
     range: float
     pattern: ^[1-9]\d*(\.\d+)?$
+    annotations:
+      scope: sample
   neonatal_delivery_procedure:
     description: 'Delivery method at birth (NCIT:C81179). Static ontology IDs: NCIT:C114141;
       NCIT:C92772; NCIT:C46088; NCIT:C81303. Type: static.'
     range: neonatal_delivery_procedure_enum
+    annotations:
+      scope: sample
   neonatal_feeding_method:
     description: Infant feeding method(s) during early life.
     range: neonatal_feeding_method_enum
     multivalued: true
+    annotations:
+      scope: sample
   neonatal_gestational_age:
     description: Gestational age at birth (EFO:0005112) in weeks.
     range: float
     pattern: ^[1-9]\d*(\.\d+)?$
+    annotations:
+      scope: sample
   neonatal_preterm_birth:
     description: 'Birth when a fetus is less than 37 weeks and 0 days gestational
       age (NCIT:C92861). Static ontology IDs: NCIT:C92861; NCIT:C114093. Type: static.'
     range: neonatal_preterm_birth_enum
+    annotations:
+      scope: sample
   obgyn_birth_control:
     description: Whether oral contraceptive birth control is currently used.
     range: obgyn_birth_control_enum
+    annotations:
+      scope: sample
   obgyn_lactating:
     description: An indication that the subject is currently producing milk. (NCIT:C82463)
     range: obgyn_lactating_enum
+    annotations:
+      scope: sample
   obgyn_menopause:
     description: 'Menopausal status of the participant. Lookup seed ontology IDs:
       NCIT:C106541. Type: looked_up. Looked up: Yes. Includes child terms: Yes. Existing-dataset-only
@@ -377,16 +440,22 @@ slots:
     range: obgyn_menopause_enum
     comments:
     - 'Values should be descendants of: NCIT:C106541'
+    annotations:
+      scope: sample
   obgyn_pregnancy:
     description: 'Current pregnancy status of the participant. Static ontology IDs:
       NCIT:C124295; NCIT:C82475. Type: static.'
     range: obgyn_pregnancy_enum
+    annotations:
+      scope: sample
   smoker:
     description: 'Tobacco smoking status/history; use `Non-smoker (finding)` only
       when past smoking history is unavailable. Static ontology IDs: SNOMED:77176002;
       SNOMED:8392000; SNOMED:8517006; SNOMED:266919005. Type: static.'
     range: smoker_enum
     multivalued: true
+    annotations:
+      scope: sample
   treatment:
     description: 'Treatment(s) or medication(s) administered to the participant. Static
       ontology IDs: NCIT:C41132. Lookup seed ontology IDs: NCIT:C1908. Type: static
@@ -397,86 +466,153 @@ slots:
     multivalued: true
     comments:
     - 'Values should be descendants of: NCIT:C1908'
+    annotations:
+      scope: sample
   tumor_staging_ajcc:
     description: American Joint Committee on Cancer (tumor staging) (SNOMED:258236004).
       A system to describe the amount and spread of cancer in a patient's body
     range: tumor_staging_ajcc_enum
+    annotations:
+      scope: sample
   tumor_staging_tnm:
     description: Tumor-node-metastasis (TNM) tumor staging system (tumor staging)
       (SNOMED:254293002).A system to describe the amount and spread of cancer in a
       patient's body
     range: string
     pattern: T[X1-4]N[X0-3]M[X0-1]|pTis|Tis
+    annotations:
+      scope: sample
   biomarker_name:
     description: A measurable and quantifiable characteristic or substance that serves
       as an indicator of a biological state, condition, or process within an organism.
     range: string
     multivalued: true
+    annotations:
+      scope: sample
   biomarker_unit:
     description: Unit for biomarker
     range: string
     multivalued: true
+    annotations:
+      scope: sample
+      unit_of: biomarker_value
   biomarker_value:
     description: Value for biomarker
     range: float
     multivalued: true
     pattern: '[0-9]+\.?[0-9]*'
+    annotations:
+      scope: sample
   disease_response_os:
     description: Overall survival duration (time to death from any cause; NCIT:C125201).
     range: float
     pattern: ^[1-9]\d*(\.\d+)?$
+    annotations:
+      scope: sample
   disease_response_os_unit:
     description: 'Unit used to report `disease_response_os`. Static ontology IDs:
       NCIT:C25301; NCIT:C29844; NCIT:C29846; NCIT:C29848. Type: static.'
     range: disease_response_os_unit_enum
+    annotations:
+      scope: sample
+      unit_of: disease_response_os
   ecog_performance_status:
     description: 'A performance status scale designed to assess disease progression
       and its affect on the daily living abilities of the patient. (NCIT:C105721)
       Static ontology IDs: NCIT:C105722; NCIT:C105723; NCIT:C105724; NCIT:C105725;
       NCIT:C105726; NCIT:C105727; NCIT:C105728. Type: static.'
     range: ecog_performance_status_enum
+    annotations:
+      scope: sample
   feces_phenotype_value:
     description: Value(s) corresponding to `feces_phenotype` measurements.
     range: string
     multivalued: true
     pattern: ^\d+(\.\d+)?$
+    annotations:
+      scope: sample
   tumor_size_measurement:
     description: Tumor size measurement from clinical assessment or resected specimen
       (NCIT:C106303).
     range: float
     pattern: ^[1-9]\d*(\.\d+)?$
+    annotations:
+      scope: sample
   tumor_size_residual_measurement:
     description: Residual tumor size measurement after treatment/procedure (NCIT:C198194).
     range: string
     pattern: ^[1-9]\d*(\.\d+)?$
+    annotations:
+      scope: sample
   uncurated_metadata:
     description: Additional free-text metadata not represented by existing fields.
     range: string
     multivalued: true
     pattern: .+
+    annotations:
+      scope: sample
+  study_name:
+    description: Canonical study identifier (for example EinsteinA_YYYY).
+    range: string
+    required: true
+    pattern: '[a-zA-Z-]+_[0-9]{4}|[a-zA-Z-]+_[0-9]{4}[a-zA-Z-]+|[a-zA-Z-]+_[0-9]{4}_[a-zA-Z-]+|[a-zA-Z-]+_[0-9]{4}_[a-zA-Z0-9]+'
+    annotations:
+      scope: study
+  curator:
+    description: Name(s) of curator(s) responsible for this entry.
+    range: string
+    multivalued: true
+    annotations:
+      scope: study
+  pmid:
+    description: PubMed identifier of the primary publication for the study.
+    range: integer
+    pattern: '[0-9]{8}'
+    annotations:
+      scope: study
+  target_condition:
+    description: 'Primary phenotype(s) or condition(s) investigated in the study.
+      Lookup seed ontology IDs: NCIT:C7057; EFO:0000408. Type: looked_up. Looked up:
+      Yes. Includes child terms: Yes. Existing-dataset-only values now: Conditional
+      (Yes only when lookup falls back to curated existing dataset values)'
+    range: target_condition_enum
+    required: true
+    multivalued: true
+    comments:
+    - 'Values should be descendants of: NCIT:C7057, EFO:0000408'
+    annotations:
+      scope: study
+  antibiotics_exclusion_period:
+    description: Minimum washout period from antibiotic use required by study criteria.
+    range: float
+    pattern: '[0-9]+\.?[0-9]*'
+    annotations:
+      scope: study
+  antibiotics_exclusion_period_unit:
+    description: 'Unit used for `antibiotics_exclusion_period`. Static ontology IDs:
+      NCIT:C25301; NCIT:C29844; NCIT:C29846. Type: static.'
+    range: antibiotics_exclusion_period_unit_enum
+    annotations:
+      scope: study
+      unit_of: antibiotics_exclusion_period
+  dna_extraction_kit:
+    description: Name of the DNA extraction kit or protocol used.
+    range: dna_extraction_kit_enum
+    annotations:
+      scope: study
+  sequencing_platform:
+    description: Sequencing platform/instrument used to generate the data.
+    range: sequencing_platform_enum
+    required: true
+    annotations:
+      scope: study
   host_species:
-    description: Host species of the participant.
+    description: Host species
     range: host_species_enum
     required: true
-    comments:
-    - 'Values should be descendants of: NCBITaxon:1'
+    annotations:
+      scope: study
 enums:
-  target_condition_enum:
-    include:
-    - reachable_from:
-        source_ontology: obo:ncit
-        source_nodes:
-        - NCIT:C7057
-        relationship_types:
-        - rdfs:subClassOf
-        is_direct: false
-    - reachable_from:
-        source_ontology: obo:mondo
-        source_nodes:
-        - MONDO:0000001
-        relationship_types:
-        - rdfs:subClassOf
-        is_direct: false
   control_enum:
     permissible_values:
       Study Control:
@@ -538,41 +674,6 @@ enums:
     permissible_values:
       'Yes': null
       'No': null
-  antibiotics_exclusion_period_unit_enum:
-    permissible_values:
-      Day:
-        meaning: NCIT:C25301
-      Week:
-        meaning: NCIT:C29844
-      Month:
-        meaning: NCIT:C29846
-  dna_extraction_kit_enum:
-    permissible_values:
-      Qiagen: null
-      Gnome: null
-      MoBio: null
-      MPBio: null
-      NorgenBiotek: null
-      Illuminakit: null
-      Maxwell_LEV: null
-      PSP_Spin_Stool: null
-      Tiangen: null
-      PowerSoil: null
-      Chemagen: null
-      other: null
-      PowerSoilPro: null
-      ZR_Fecal_DNA_MiniPrep: null
-      KAMA_Hyper_Prep: null
-      thermo_fisher: null
-      QIAamp: null
-  sequencing_platform_enum:
-    permissible_values:
-      IlluminaHiSeq: null
-      IlluminaMiSeq: null
-      IlluminaNextSeq: null
-      IlluminaNovaSeq: null
-      IonProton: null
-      BGISeq: null
   age_group_enum:
     permissible_values:
       Newborn:
@@ -660,9 +761,9 @@ enums:
         - rdfs:subClassOf
         is_direct: false
     - reachable_from:
-        source_ontology: obo:mondo
+        source_ontology: obo:efo
         source_nodes:
-        - MONDO:0000001
+        - EFO:0000408
         relationship_types:
         - rdfs:subClassOf
         is_direct: false
@@ -676,9 +777,9 @@ enums:
         - rdfs:subClassOf
         is_direct: false
     - reachable_from:
-        source_ontology: obo:mondo
+        source_ontology: obo:efo
         source_nodes:
-        - MONDO:0000001
+        - EFO:0000408
         relationship_types:
         - rdfs:subClassOf
         is_direct: false
@@ -823,12 +924,57 @@ enums:
         meaning: NCIT:C105727
       ECOG Performance Status 5:
         meaning: NCIT:C105728
-  host_species_enum:
+  target_condition_enum:
     include:
     - reachable_from:
-        source_ontology: obo:ncbitaxon
+        source_ontology: obo:ncit
         source_nodes:
-        - NCBITaxon:1
+        - NCIT:C7057
         relationship_types:
         - rdfs:subClassOf
         is_direct: false
+    - reachable_from:
+        source_ontology: obo:efo
+        source_nodes:
+        - EFO:0000408
+        relationship_types:
+        - rdfs:subClassOf
+        is_direct: false
+  antibiotics_exclusion_period_unit_enum:
+    permissible_values:
+      Day:
+        meaning: NCIT:C25301
+      Week:
+        meaning: NCIT:C29844
+      Month:
+        meaning: NCIT:C29846
+  dna_extraction_kit_enum:
+    permissible_values:
+      PSP Spin Stool DNA Plus Kit: null
+      PowerSoil DNA Isolation Kit: null
+      DNeasy PowerSoil Pro Kit: null
+      ZR Fecal DNA MiniPrep Kit: null
+      QIAamp: null
+      Maxwell LEV: null
+      QIAGEN: null
+      MO BIO Laboratories: null
+      MP Biomedicals: null
+      Norgen Biotek: null
+      TIANGEN: null
+      Thermo Fisher Scientific: null
+      chemagen: null
+      KAPA HyperPrep Kit: null
+  sequencing_platform_enum:
+    permissible_values:
+      Illumina HiSeq: null
+      Illumina MiSeq: null
+      Illumina NextSeq: null
+      Illumina NovaSeq: null
+      Ion Torrent Proton: null
+      BGISEQ: null
+  host_species_enum:
+    permissible_values:
+      Human:
+        meaning: NCIT:C14225
+      Mouse:
+        meaning: NCIT:C14238

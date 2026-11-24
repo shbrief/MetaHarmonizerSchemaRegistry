@@ -29,38 +29,6 @@
     "Yes",
     "No"
   ],
-  "antibiotics_exclusion_period_unit": [
-    "Day",
-    "Week",
-    "Month"
-  ],
-  "dna_extraction_kit": [
-    "Qiagen",
-    "Gnome",
-    "MoBio",
-    "MPBio",
-    "NorgenBiotek",
-    "Illuminakit",
-    "Maxwell_LEV",
-    "PSP_Spin_Stool",
-    "Tiangen",
-    "PowerSoil",
-    "Chemagen",
-    "other",
-    "PowerSoilPro",
-    "ZR_Fecal_DNA_MiniPrep",
-    "KAMA_Hyper_Prep",
-    "thermo_fisher",
-    "QIAamp"
-  ],
-  "sequencing_platform": [
-    "IlluminaHiSeq",
-    "IlluminaMiSeq",
-    "IlluminaNextSeq",
-    "IlluminaNovaSeq",
-    "IonProton",
-    "BGISeq"
-  ],
   "age_group": [
     "Newborn",
     "Infant",
@@ -191,5 +159,38 @@
     "ECOG Performance Status 3",
     "ECOG Performance Status 4",
     "ECOG Performance Status 5"
+  ],
+  "antibiotics_exclusion_period_unit": [
+    "Day",
+    "Week",
+    "Month"
+  ],
+  "dna_extraction_kit": [
+    "PSP Spin Stool DNA Plus Kit",
+    "PowerSoil DNA Isolation Kit",
+    "DNeasy PowerSoil Pro Kit",
+    "ZR Fecal DNA MiniPrep Kit",
+    "QIAamp",
+    "Maxwell LEV",
+    "QIAGEN",
+    "MO BIO Laboratories",
+    "MP Biomedicals",
+    "Norgen Biotek",
+    "TIANGEN",
+    "Thermo Fisher Scientific",
+    "chemagen",
+    "KAPA HyperPrep Kit"
+  ],
+  "sequencing_platform": [
+    "Illumina HiSeq",
+    "Illumina MiSeq",
+    "Illumina NextSeq",
+    "Illumina NovaSeq",
+    "Ion Torrent Proton",
+    "BGISEQ"
+  ],
+  "host_species": [
+    "Human",
+    "Mouse"
   ]
 }
